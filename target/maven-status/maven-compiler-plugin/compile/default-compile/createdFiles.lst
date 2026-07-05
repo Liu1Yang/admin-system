@@ -1,9 +1,0 @@
-com\liuyang\admin\entity\User.class
-com\liuyang\admin\controller\HealthController.class
-com\liuyang\admin\AdminApplication.class
-com\liuyang\admin\controller\UserController.class
-com\liuyang\admin\vo\UserVO.class
-com\liuyang\admin\common\Result.class
-com\liuyang\admin\service\impl\UserServiceImpl.class
-com\liuyang\admin\mapper\UserMapper.class
-com\liuyang\admin\service\UserService.class
