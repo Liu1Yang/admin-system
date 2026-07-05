@@ -1,10 +1,12 @@
 package com.liuyang.admin.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.dto.UserCreateDTO;
 import com.liuyang.admin.dto.UserUpdateDTO;
 import com.liuyang.admin.entity.User;
 import com.liuyang.admin.service.UserService;
+import com.liuyang.admin.vo.PageVO;
 import com.liuyang.admin.vo.UserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Validated
@@ -33,11 +35,31 @@ public class UserController {
     }
 
     @GetMapping
-    public Result<List<UserVO>> list() {
-        List<UserVO> list = userService.listAll().stream()
+    public Result<PageVO<UserVO>> page(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String username) { // 分页+可选搜索
+        Page<User> userPage = userService.page(page, size, username);
+
+        PageVO<UserVO> pageVO = new PageVO<>();
+        pageVO.setRecords(userPage.getRecords().stream()
                 .map(this::toVO)
-                .collect(Collectors.toList());
-        return Result.success(list);
+                .collect(Collectors.toList()));
+/* 等同于   =》    把 List<User> 转成 List<UserVO>。
+    可更换成
+    List<User> userList = userPage.getRecords();
+    List<UserVO> voList = new ArrayList<>();
+    for (User user : userList) {
+        voList.add(toVO(user));
+    }
+    pageVO.setRecords(voList);
+*/
+        pageVO.setTotal(userPage.getTotal());
+        pageVO.setCurrent(userPage.getCurrent());
+        pageVO.setSize(userPage.getSize());
+        pageVO.setPages(userPage.getPages());
+
+        return Result.success(pageVO);
     }
 
     @GetMapping("/{id}")

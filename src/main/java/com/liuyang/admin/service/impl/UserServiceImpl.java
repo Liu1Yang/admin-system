@@ -1,6 +1,7 @@
 package com.liuyang.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liuyang.admin.common.BusinessException;
 import com.liuyang.admin.dto.UserCreateDTO;
 import com.liuyang.admin.dto.UserUpdateDTO;
@@ -9,8 +10,6 @@ import com.liuyang.admin.mapper.UserMapper;
 import com.liuyang.admin.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,8 +21,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> listAll() {
-        return userMapper.selectList(null);
+    public Page<User> page(int pageNum, int pageSize, String username) {
+        Page<User> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.hasText(username)) {
+            wrapper.like(User::getUsername, username); // 模糊搜索  有 username → WHERE username LIKE '%admin%'
+        }
+        wrapper.orderByDesc(User::getCreateTime); // 按创建时间倒序  没有 → 查全部，但只查当前页
+        return userMapper.selectPage(page, wrapper);
     }
 
     @Override
@@ -45,9 +50,6 @@ public class UserServiceImpl implements UserService {
         user.setPassword(dto.getPassword());
         user.setNickname(dto.getNickname());
         userMapper.insert(user);
-        if(user==null){
-            throw new BusinessException(400,"用户不存在");
-        }
         return user;
     }
 
