@@ -8,6 +8,7 @@ import com.liuyang.admin.dto.UserUpdateDTO;
 import com.liuyang.admin.entity.User;
 import com.liuyang.admin.mapper.UserMapper;
 import com.liuyang.admin.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -15,9 +16,11 @@ import org.springframework.util.StringUtils;
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setNickname(dto.getNickname());
         userMapper.insert(user);
         return user;
@@ -58,7 +61,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(id);
 
         if (StringUtils.hasText(dto.getPassword())) {
-            user.setPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
         if (dto.getNickname() != null) {
             user.setNickname(dto.getNickname());

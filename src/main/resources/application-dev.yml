@@ -31,4 +31,8 @@ springdoc:
 knife4j:
   enable: true
   setting:
-    language: zh_cn  # 中文页面
+    language: zh_cn
+
+jwt:
+  secret: liuyang-admin-system-jwt-secret-key-2024-study-demo
+  expiration: 86400000     # 24 小时 = 24 × 60 × 60 × 1000
