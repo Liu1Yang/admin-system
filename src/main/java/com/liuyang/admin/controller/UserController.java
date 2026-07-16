@@ -3,10 +3,14 @@ package com.liuyang.admin.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.dto.UserCreateDTO;
+import com.liuyang.admin.dto.UserRoleAssignDTO;
 import com.liuyang.admin.dto.UserUpdateDTO;
+import com.liuyang.admin.entity.Role;
 import com.liuyang.admin.entity.User;
+import com.liuyang.admin.service.RoleService;
 import com.liuyang.admin.service.UserService;
 import com.liuyang.admin.vo.PageVO;
+import com.liuyang.admin.vo.RoleVO;
 import com.liuyang.admin.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Tag(name = "用户管理") // 接口分组（加在 Controller 类上）
@@ -33,9 +38,11 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @Operation(summary = "分页查询用户", description = "支持按 username 模糊搜索") //  接口说明（加在方法上）summary：接口标题 description：详细说明
@@ -93,9 +100,34 @@ public class UserController {
         return Result.success();
     }
 
+    @Operation(summary = "查询用户已绑定的角色")
+    @GetMapping("/{id}/roles")
+    public Result<List<RoleVO>> listRoles(
+            @Parameter(description = "用户 ID") @PathVariable Long id) {
+        List<RoleVO> roles = roleService.listByUserId(id).stream()
+                .map(this::toRoleVO)
+                .collect(Collectors.toList());
+        return Result.success(roles);
+    }
+
+    @Operation(summary = "给用户绑定角色", description = "覆盖式绑定：先清空该用户原有角色，再写入 roleIds")
+    @PostMapping("/{id}/roles")
+    public Result<Void> assignRoles(
+            @Parameter(description = "用户 ID") @PathVariable Long id,
+            @Valid @RequestBody UserRoleAssignDTO dto) {
+        roleService.assignRoles(id, dto);
+        return Result.success();
+    }
+
     private UserVO toVO(User user) {
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
+        return vo;
+    }
+
+    private RoleVO toRoleVO(Role role) {
+        RoleVO vo = new RoleVO();
+        BeanUtils.copyProperties(role, vo);
         return vo;
     }
 }

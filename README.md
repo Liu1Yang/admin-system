@@ -16,6 +16,7 @@
 
 - 用户注册 / 登录 / 获取当前用户
 - 用户 CRUD、分页、模糊搜索
+- RBAC 角色查询、用户绑定角色
 - JWT 无状态鉴权
 - Redis 缓存用户信息
 - 统一返回、全局异常、参数校验
@@ -34,6 +35,8 @@
 ### 1. 初始化数据库
 
 执行 `sql/init.sql`。若已有旧数据，再执行 `sql/update-password-bcrypt.sql`（测试账号密码仍为 `123456`）。
+
+执行 `sql/rbac.sql` 初始化角色权限表（admin → 管理员，liuyang → 普通用户）。
 
 ### 2. 修改配置
 
@@ -70,6 +73,8 @@ java -jar target/admin-system-1.0.0.jar
 |------|------|
 | 认证 | POST `/api/auth/login`、`/api/auth/register`、GET `/api/auth/me` |
 | 用户 | GET `/api/users`（分页）、CRUD `/api/users/{id}` |
+| 角色 | GET `/api/roles`、POST `/api/roles`、GET `/api/roles/{id}` |
+| 用户角色 | GET `/api/users/{id}/roles`、POST `/api/users/{id}/roles` |
 | 文件 | POST `/api/files/upload` |
 
 除登录、注册、健康检查、文档页外，业务接口需在 Header 携带：
