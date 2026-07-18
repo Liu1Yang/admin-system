@@ -1,5 +1,6 @@
 package com.liuyang.admin.controller;
 
+import com.liuyang.admin.annotation.RequirePermission;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.dto.RoleCreateDTO;
 import com.liuyang.admin.entity.Role;
@@ -50,6 +51,7 @@ public class RoleController {
     }
 
     @Operation(summary = "新增角色")
+    @RequirePermission("role:assign") // 标记接口要什么权限
     @PostMapping
     public Result<RoleVO> create(@Valid @RequestBody RoleCreateDTO dto) {
         return Result.success(toVO(roleService.create(dto)));

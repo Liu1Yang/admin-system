@@ -72,7 +72,7 @@ public class RoleServiceImpl implements RoleService {
     public void assignRoles(Long userId, UserRoleAssignDTO dto) {
         ensureUserExists(userId); // 校验用户存在
 
-        List<Long> roleIds = dto.getRoleIds()oleIds();
+        List<Long> roleIds = dto.getRoleIds();
         if (roleIds != null) {  // 检验每个roleId存在
             for (Long roleId : roleIds) {
                 if (roleMapper.selectById(roleId) == null) {

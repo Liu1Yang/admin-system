@@ -1,6 +1,7 @@
 package com.liuyang.admin.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.liuyang.admin.annotation.RequirePermission;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.dto.UserCreateDTO;
 import com.liuyang.admin.dto.UserRoleAssignDTO;
@@ -93,6 +94,7 @@ public class UserController {
     }
 
     @Operation(summary = "删除用户")
+    @RequirePermission("user:delete")
     @DeleteMapping("/{id}")
     public Result<Void> delete(
             @Parameter(description = "用户 ID") @PathVariable Long id) {
@@ -111,6 +113,7 @@ public class UserController {
     }
 
     @Operation(summary = "给用户绑定角色", description = "覆盖式绑定：先清空该用户原有角色，再写入 roleIds")
+    @RequirePermission("role:assign")
     @PostMapping("/{id}/roles")
     public Result<Void> assignRoles(
             @Parameter(description = "用户 ID") @PathVariable Long id,
