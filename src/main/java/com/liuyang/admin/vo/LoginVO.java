@@ -10,6 +10,6 @@ public class LoginVO {
     @Schema(description = "JWT Token")
     private String token;
 
-    @Schema(description = "用户信息")
-    private UserVO user;
+    @Schema(description = "用户信息（含角色与权限）")
+    private CurrentUserVO user;
 }

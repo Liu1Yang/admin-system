@@ -1,0 +1,453 @@
+{
+  "info": {
+    "_postman_id": "admin-system-rbac-day13",
+    "name": "admin-system RBAC (Day9-13)",
+    "description": "RBAC 联调用例。导入后先跑「0-准备」文件夹登录，再按序执行。\n\n注意：业务错误 HTTP 仍为 200，请看响应 body 的 code 字段（401/403/404 等）。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "adminToken", "value": "" },
+    { "key": "liuyangToken", "value": "" },
+    { "key": "liuyangUserId", "value": "2" },
+    { "key": "tempUserId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0-准备",
+      "item": [
+        {
+          "name": "admin 登录",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('登录成功 code=200', function () { pm.expect(res.code).to.eql(200); });",
+                  "pm.test('admin 有 ADMIN 角色', function () {",
+                  "    var roles = res.data.user.roles.map(r => r.code);",
+                  "    pm.expect(roles).to.include('ADMIN');",
+                  "});",
+                  "pm.test('admin 有 4 个权限', function () {",
+                  "    pm.expect(res.data.user.permissions.length).to.eql(4);",
+                  "});",
+                  "pm.collectionVariables.set('adminToken', res.data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "liuyang 登录",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('登录成功 code=200', function () { pm.expect(res.code).to.eql(200); });",
+                  "pm.test('liuyang 有 USER 角色', function () {",
+                  "    var roles = res.data.user.roles.map(r => r.code);",
+                  "    pm.expect(roles).to.include('USER');",
+                  "});",
+                  "pm.test('liuyang 无特殊权限', function () {",
+                  "    pm.expect(res.data.user.permissions.length).to.eql(0);",
+                  "});",
+                  "pm.collectionVariables.set('liuyangToken', res.data.token);",
+                  "pm.collectionVariables.set('liuyangUserId', res.data.user.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"liuyang\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1-认证",
+      "item": [
+        {
+          "name": "admin GET /me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });",
+                  "pm.test('返回 roles 和 permissions', function () {",
+                  "    var data = pm.response.json().data;",
+                  "    pm.expect(data.roles).to.be.an('array').that.is.not.empty;",
+                  "    pm.expect(data.permissions).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "无 Token 访问 /me → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=401', function () { pm.expect(pm.response.json().code).to.eql(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2-普通用户越权 → 403",
+      "item": [
+        {
+          "name": "liuyang 删用户 → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=403', function () { pm.expect(pm.response.json().code).to.eql(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{liuyangToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/users/1"
+          }
+        },
+        {
+          "name": "liuyang 创建用户 → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=403', function () { pm.expect(pm.response.json().code).to.eql(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{liuyangToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"hack01\",\n  \"password\": \"123456\",\n  \"nickname\": \"非法创建\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "liuyang 绑角色 → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=403', function () { pm.expect(pm.response.json().code).to.eql(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{liuyangToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleIds\": [1]\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{liuyangUserId}}/roles"
+          }
+        },
+        {
+          "name": "liuyang 新增角色 → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=403', function () { pm.expect(pm.response.json().code).to.eql(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{liuyangToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"HACKER\",\n  \"name\": \"非法角色\"\n}"
+            },
+            "url": "{{baseUrl}}/api/roles"
+          }
+        },
+        {
+          "name": "liuyang 查用户列表 → 200（登录即可）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{liuyangToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/users?page=1&size=10"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3-管理员操作 → 200",
+      "item": [
+        {
+          "name": "admin 查全部角色",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });",
+                  "pm.test('至少 2 个角色', function () {",
+                  "    pm.expect(pm.response.json().data.length).to.be.at.least(2);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/roles"
+          }
+        },
+        {
+          "name": "admin 创建临时用户 testrbac",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('code=200', function () { pm.expect(res.code).to.eql(200); });",
+                  "pm.collectionVariables.set('tempUserId', res.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testrbac\",\n  \"password\": \"123456\",\n  \"nickname\": \"RBAC测试用户\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "admin 查 testrbac 角色（默认 USER）",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('code=200', function () { pm.expect(res.code).to.eql(200); });",
+                  "pm.test('默认 USER 角色', function () {",
+                  "    var codes = res.data.map(r => r.code);",
+                  "    pm.expect(codes).to.include('USER');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/users/{{tempUserId}}/roles"
+          }
+        },
+        {
+          "name": "admin 给 testrbac 绑 ADMIN 再改回 USER",
+          "item": [
+            {
+              "name": "绑 ADMIN",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleIds\": [1]\n}"
+                },
+                "url": "{{baseUrl}}/api/users/{{tempUserId}}/roles"
+              }
+            },
+            {
+              "name": "改回 USER",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roleIds\": [2]\n}"
+                },
+                "url": "{{baseUrl}}/api/users/{{tempUserId}}/roles"
+              }
+            }
+          ]
+        },
+        {
+          "name": "admin 删除临时用户 testrbac",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/users/{{tempUserId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4-恢复 liuyang 为 USER",
+      "item": [
+        {
+          "name": "确保 liuyang 角色为 USER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('code=200', function () { pm.expect(pm.response.json().code).to.eql(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleIds\": [2]\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{liuyangUserId}}/roles"
+          }
+        }
+      ]
+    }
+  ]
+}

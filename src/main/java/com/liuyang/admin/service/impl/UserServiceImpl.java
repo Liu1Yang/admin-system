@@ -7,6 +7,7 @@ import com.liuyang.admin.dto.UserCreateDTO;
 import com.liuyang.admin.dto.UserUpdateDTO;
 import com.liuyang.admin.entity.User;
 import com.liuyang.admin.mapper.UserMapper;
+import com.liuyang.admin.service.RoleService;
 import com.liuyang.admin.service.UserService;
 import com.liuyang.admin.service.cache.UserCacheService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,13 +20,16 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserCacheService userCacheService;
+    private final RoleService roleService;
 
     public UserServiceImpl(UserMapper userMapper,
                            PasswordEncoder passwordEncoder,
-                           UserCacheService userCacheService) {
+                           UserCacheService userCacheService,
+                           RoleService roleService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.userCacheService = userCacheService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -68,6 +72,7 @@ public class UserServiceImpl implements UserService {
         user.setNickname(dto.getNickname());
         userMapper.insert(user);
         userCacheService.set(user);
+        roleService.assignDefaultUserRole(user.getId());
         return user;
     }
 

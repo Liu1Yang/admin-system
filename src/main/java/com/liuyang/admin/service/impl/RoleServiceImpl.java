@@ -94,4 +94,20 @@ public class RoleServiceImpl implements RoleService {
             throw new BusinessException(404, "用户不存在");
         }
     }
+
+    @Override
+    public void assignDefaultUserRole(Long userId) {
+        Role userRole = roleMapper.selectOne(
+                new LambdaQueryWrapper<Role>().eq(Role::getCode, "USER")
+        );
+        if (userRole == null) {
+            return;
+        }
+
+        boolean alreadyAssigned = userRoleMapper.selectByUserId(userId).stream()
+                .anyMatch(item -> userRole.getId().equals(item.getRoleId()));
+        if (!alreadyAssigned) {
+            userRoleMapper.insert(userId, userRole.getId());
+        }
+    }
 }

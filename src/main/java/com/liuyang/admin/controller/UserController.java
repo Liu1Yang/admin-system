@@ -77,7 +77,8 @@ public class UserController {
         return Result.success(toVO(user));
     }
 
-    @Operation(summary = "新增用户")
+    @Operation(summary = "新增用户", description = "管理员操作，需 role:assign 权限")
+    @RequirePermission("role:assign")
     @PostMapping
     public Result<UserVO> create(@Valid @RequestBody UserCreateDTO dto) {
         User user = userService.create(dto);

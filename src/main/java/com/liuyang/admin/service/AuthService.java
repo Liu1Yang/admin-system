@@ -2,6 +2,7 @@ package com.liuyang.admin.service;
 
 import com.liuyang.admin.dto.LoginDTO;
 import com.liuyang.admin.dto.UserCreateDTO;
+import com.liuyang.admin.vo.CurrentUserVO;
 import com.liuyang.admin.vo.LoginVO;
 import com.liuyang.admin.vo.UserVO;
 
@@ -11,5 +12,5 @@ public interface AuthService {
 
     UserVO register(UserCreateDTO dto);
 
-    UserVO getCurrentUser(Long userId);
+    CurrentUserVO getCurrentUser(Long userId);
 }

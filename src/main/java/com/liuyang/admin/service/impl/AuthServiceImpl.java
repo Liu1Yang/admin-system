@@ -5,29 +5,45 @@ import com.liuyang.admin.common.BusinessException;
 import com.liuyang.admin.common.JwtUtil;
 import com.liuyang.admin.dto.LoginDTO;
 import com.liuyang.admin.dto.UserCreateDTO;
+import com.liuyang.admin.entity.Permission;
+import com.liuyang.admin.entity.Role;
 import com.liuyang.admin.entity.User;
+import com.liuyang.admin.mapper.PermissionMapper;
+import com.liuyang.admin.mapper.RoleMapper;
 import com.liuyang.admin.mapper.UserMapper;
 import com.liuyang.admin.service.AuthService;
 import com.liuyang.admin.service.UserService;
+import com.liuyang.admin.vo.CurrentUserVO;
 import com.liuyang.admin.vo.LoginVO;
+import com.liuyang.admin.vo.PermissionVO;
+import com.liuyang.admin.vo.RoleVO;
 import com.liuyang.admin.vo.UserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
+    private final RoleMapper roleMapper;
+    private final PermissionMapper permissionMapper;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     public AuthServiceImpl(UserMapper userMapper,
+                           RoleMapper roleMapper,
+                           PermissionMapper permissionMapper,
                            UserService userService,
                            PasswordEncoder passwordEncoder,
                            JwtUtil jwtUtil) {
         this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
+        this.permissionMapper = permissionMapper;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -44,28 +60,57 @@ public class AuthServiceImpl implements AuthService {
 
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(jwtUtil.generateToken(user.getId(), user.getUsername()));
-        loginVO.setUser(toVO(user));
+        loginVO.setUser(buildCurrentUserVO(user));
         return loginVO;
     }
 
     @Override
     public UserVO register(UserCreateDTO dto) {
         User user = userService.create(dto);
-        return toVO(user);
+        return toUserVO(user);
     }
 
     @Override
-    public UserVO getCurrentUser(Long userId) {
+    public CurrentUserVO getCurrentUser(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new BusinessException(404, "用户不存在");
         }
-        return toVO(user);
+        return buildCurrentUserVO(user);
     }
 
-    private UserVO toVO(User user) {
+    private CurrentUserVO buildCurrentUserVO(User user) {
+        CurrentUserVO vo = new CurrentUserVO();
+        BeanUtils.copyProperties(user, vo);
+
+        List<RoleVO> roles = roleMapper.selectByUserId(user.getId()).stream()
+                .map(this::toRoleVO)
+                .collect(Collectors.toList());
+        vo.setRoles(roles);
+
+        List<PermissionVO> permissions = permissionMapper.selectByUserId(user.getId()).stream()
+                .map(this::toPermissionVO)
+                .collect(Collectors.toList());
+        vo.setPermissions(permissions);
+        return vo;
+    }
+
+    private UserVO toUserVO(User user) {
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
+        return vo;
+    }
+
+    private RoleVO toRoleVO(Role role) {
+        RoleVO vo = new RoleVO();
+        BeanUtils.copyProperties(role, vo);
+        return vo;
+    }
+
+    private PermissionVO toPermissionVO(Permission permission) {
+        PermissionVO vo = new PermissionVO();
+        vo.setCode(permission.getCode());
+        vo.setName(permission.getName());
         return vo;
     }
 }

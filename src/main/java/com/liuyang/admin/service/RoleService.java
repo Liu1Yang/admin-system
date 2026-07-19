@@ -17,4 +17,9 @@ public interface RoleService {
     List<Role> listByUserId(Long userId);
 
     void assignRoles(Long userId, UserRoleAssignDTO dto);
+
+    /**
+     * 为新用户绑定默认 USER 角色（若尚未绑定）
+     */
+    void assignDefaultUserRole(Long userId);
 }

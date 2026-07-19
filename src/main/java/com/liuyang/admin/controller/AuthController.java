@@ -5,6 +5,7 @@ import com.liuyang.admin.common.UserContext;
 import com.liuyang.admin.dto.LoginDTO;
 import com.liuyang.admin.dto.UserCreateDTO;
 import com.liuyang.admin.service.AuthService;
+import com.liuyang.admin.vo.CurrentUserVO;
 import com.liuyang.admin.vo.LoginVO;
 import com.liuyang.admin.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,9 +43,9 @@ public class AuthController {
         return Result.success(authService.register(dto));
     }
 
-    @Operation(summary = "获取当前登录用户", description = "需要在 Header 携带 Authorization: Bearer {token}")
+    @Operation(summary = "获取当前登录用户", description = "返回用户信息及角色、权限列表，需在 Header 携带 Authorization: Bearer {token}")
     @GetMapping("/me")
-    public Result<UserVO> me() {
+    public Result<CurrentUserVO> me() {
         return Result.success(authService.getCurrentUser(UserContext.getUserId()));
     }
 }
