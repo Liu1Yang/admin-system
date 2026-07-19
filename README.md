@@ -17,6 +17,9 @@
 - 用户注册 / 登录 / 获取当前用户
 - 用户 CRUD、分页、模糊搜索
 - RBAC 角色查询、用户绑定角色、接口级权限控制（403）
+- 登录 / 当前用户接口返回角色与权限列表
+- 商品分类树形 CRUD
+- 商品 CRUD（关联分类、默认下架）
 - JWT 无状态鉴权
 - Redis 缓存用户信息
 - 统一返回、全局异常、参数校验
@@ -37,6 +40,10 @@
 执行 `sql/init.sql`。若已有旧数据，再执行 `sql/update-password-bcrypt.sql`（测试账号密码仍为 `123456`）。
 
 执行 `sql/rbac.sql` 初始化角色权限表（admin → 管理员，liuyang → 普通用户）。
+
+执行 `sql/category.sql` 初始化商品分类表。
+
+执行 `sql/product.sql` 初始化商品表。
 
 ### 2. 修改配置
 
@@ -75,6 +82,8 @@ java -jar target/admin-system-1.0.0.jar
 | 用户 | GET `/api/users`（分页）、CRUD `/api/users/{id}` |
 | 角色 | GET `/api/roles`、POST `/api/roles`、GET `/api/roles/{id}` |
 | 用户角色 | GET `/api/users/{id}/roles`、POST `/api/users/{id}/roles` |
+| 分类 | GET `/api/categories/tree`、CRUD `/api/categories/{id}` |
+| 商品 | GET `/api/products/{id}`、POST/PUT/DELETE `/api/products` |
 | 文件 | POST `/api/files/upload` |
 
 除登录、注册、健康检查、文档页外，业务接口需在 Header 携带：
@@ -82,6 +91,15 @@ java -jar target/admin-system-1.0.0.jar
 ```text
 Authorization: Bearer {token}
 ```
+
+## RBAC 联调（Day13）
+
+1. 启动项目，确认已执行 `sql/rbac.sql`
+2. Postman → Import → 选择 `postman/RBAC.postman_collection.json`
+3. 按文件夹顺序执行：**0-准备** → **1-认证** → **2-越权 403** → **3-管理员 200** → **4-恢复数据**
+4. MySQL 验证可执行 `sql/rbac-verify.sql`
+
+> 业务错误时 HTTP 状态码仍为 200，请看响应 JSON 里的 `code` 字段（401/403 等）。
 
 ## 简历项目描述（可直接改写）
 
