@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liuyang.admin.common.BusinessException;
 import com.liuyang.admin.dto.ProductCreateDTO;
 import com.liuyang.admin.dto.ProductUpdateDTO;
-import com.liuyang.admin.entity.Category;
 import com.liuyang.admin.entity.Product;
 import com.liuyang.admin.mapper.ProductMapper;
 import com.liuyang.admin.service.CategoryService;
@@ -18,7 +17,8 @@ import java.math.BigDecimal;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private static final int STATUS_OFF = 0; // 初始下架状态
+    private static final int STATUS_OFF = 0;
+    private static final int STATUS_ON = 1;
 
     private final ProductMapper productMapper;
     private final CategoryService categoryService;
@@ -97,6 +97,9 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(dto.getPrice());
         }
         if (dto.getStock() != null) {
+            if (product.getStatus() == STATUS_ON && dto.getStock() == 0) {
+                throw new BusinessException(400, "上架商品库存不能为 0");
+            }
             product.setStock(dto.getStock());
         }
         if (dto.getCoverUrl() != null) {
@@ -111,6 +114,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product updateStatus(Long id, Integer status) {
+        Product product = getById(id);
+        validateStatus(status);
+
+        if (status == STATUS_ON && (product.getStock() == null || product.getStock() <= 0)) {
+            throw new BusinessException(400, "库存不足，无法上架");
+        }
+
+        product.setStatus(status);
+        productMapper.updateById(product);
+        return product;
+    }
+
+    @Override
     public void delete(Long id) {
         getById(id);
         productMapper.deleteById(id);
@@ -118,5 +135,11 @@ public class ProductServiceImpl implements ProductService {
 
     private void validateCategory(Long categoryId) {
         categoryService.getById(categoryId);
+    }
+
+    private void validateStatus(Integer status) {
+        if (status == null || (status != STATUS_OFF && status != STATUS_ON)) {
+            throw new BusinessException(400, "status 只能为 0 或 1");
+        }
     }
 }

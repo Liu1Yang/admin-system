@@ -19,7 +19,7 @@
 - RBAC 角色查询、用户绑定角色、接口级权限控制（403）
 - 登录 / 当前用户接口返回角色与权限列表
 - 商品分类树形 CRUD
-- 商品 CRUD（关联分类、默认下架）
+- 商品 CRUD（关联分类、默认下架）、分页多条件搜索、上下架与库存校验
 - JWT 无状态鉴权
 - Redis 缓存用户信息
 - 统一返回、全局异常、参数校验
@@ -83,7 +83,7 @@ java -jar target/admin-system-1.0.0.jar
 | 角色 | GET `/api/roles`、POST `/api/roles`、GET `/api/roles/{id}` |
 | 用户角色 | GET `/api/users/{id}/roles`、POST `/api/users/{id}/roles` |
 | 分类 | GET `/api/categories/tree`、CRUD `/api/categories/{id}` |
-| 商品 | GET `/api/products`（分页搜索）、GET `/api/products/{id}`、POST/PUT/DELETE |
+| 商品 | GET `/api/products`（分页搜索）、GET `/api/products/{id}`、PUT `/api/products/{id}/status`、POST/PUT/DELETE |
 | 文件 | POST `/api/files/upload` |
 
 除登录、注册、健康检查、文档页外，业务接口需在 Header 携带：

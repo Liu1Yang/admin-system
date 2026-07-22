@@ -5,6 +5,7 @@ import com.liuyang.admin.annotation.RequirePermission;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.common.UserContext;
 import com.liuyang.admin.dto.ProductCreateDTO;
+import com.liuyang.admin.dto.ProductStatusUpdateDTO;
 import com.liuyang.admin.dto.ProductUpdateDTO;
 import com.liuyang.admin.entity.Product;
 import com.liuyang.admin.service.CategoryService;
@@ -97,6 +98,16 @@ public class ProductController {
             @Parameter(description = "商品 ID") @PathVariable Long id,
             @Valid @RequestBody ProductUpdateDTO dto) {
         Product product = productService.update(id, dto);
+        return Result.success(toVO(product));
+    }
+
+    @Operation(summary = "商品上下架", description = "上架时库存必须大于 0")
+    @RequirePermission("product:write")
+    @PutMapping("/{id}/status")
+    public Result<ProductVO> updateStatus(
+            @Parameter(description = "商品 ID") @PathVariable Long id,
+            @Valid @RequestBody ProductStatusUpdateDTO dto) {
+        Product product = productService.updateStatus(id, dto.getStatus());
         return Result.success(toVO(product));
     }
 
