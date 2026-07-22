@@ -83,7 +83,7 @@ java -jar target/admin-system-1.0.0.jar
 | 角色 | GET `/api/roles`、POST `/api/roles`、GET `/api/roles/{id}` |
 | 用户角色 | GET `/api/users/{id}/roles`、POST `/api/users/{id}/roles` |
 | 分类 | GET `/api/categories/tree`、CRUD `/api/categories/{id}` |
-| 商品 | GET `/api/products/{id}`、POST/PUT/DELETE `/api/products` |
+| 商品 | GET `/api/products`（分页搜索）、GET `/api/products/{id}`、POST/PUT/DELETE |
 | 文件 | POST `/api/files/upload` |
 
 除登录、注册、健康检查、文档页外，业务接口需在 Header 携带：

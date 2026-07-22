@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,19 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BusinessException(404, "分类不存在");
         }
         return category;
+    }
+
+    @Override
+    public Map<Long, String> mapNameByIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<Category> categories = categoryMapper.selectBatchIds(ids);
+        Map<Long, String> nameMap = new HashMap<>();
+        for (Category category : categories) {
+            nameMap.put(category.getId(), category.getName());
+        }
+        return nameMap;
     }
 
     @Override

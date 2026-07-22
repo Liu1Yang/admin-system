@@ -1,5 +1,7 @@
 package com.liuyang.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liuyang.admin.common.BusinessException;
 import com.liuyang.admin.dto.ProductCreateDTO;
 import com.liuyang.admin.dto.ProductUpdateDTO;
@@ -10,6 +12,8 @@ import com.liuyang.admin.service.CategoryService;
 import com.liuyang.admin.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -22,6 +26,34 @@ public class ProductServiceImpl implements ProductService {
     public ProductServiceImpl(ProductMapper productMapper, CategoryService categoryService) {
         this.productMapper = productMapper;
         this.categoryService = categoryService;
+    }
+
+    @Override
+    public Page<Product> page(int pageNum, int pageSize, String name, Long categoryId,
+                              Integer status, BigDecimal minPrice, BigDecimal maxPrice) {
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new BusinessException(400, "最低价不能大于最高价");
+        }
+
+        Page<Product> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.hasText(name)) {
+            wrapper.like(Product::getName, name);
+        }
+        if (categoryId != null) {
+            wrapper.eq(Product::getCategoryId, categoryId);
+        }
+        if (status != null) {
+            wrapper.eq(Product::getStatus, status);
+        }
+        if (minPrice != null) {
+            wrapper.ge(Product::getPrice, minPrice);
+        }
+        if (maxPrice != null) {
+            wrapper.le(Product::getPrice, maxPrice);
+        }
+        wrapper.orderByDesc(Product::getCreateTime);
+        return productMapper.selectPage(page, wrapper);
     }
 
     @Override
