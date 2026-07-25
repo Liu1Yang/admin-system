@@ -9,7 +9,9 @@ import com.liuyang.admin.dto.ProductStatusUpdateDTO;
 import com.liuyang.admin.dto.ProductUpdateDTO;
 import com.liuyang.admin.entity.Product;
 import com.liuyang.admin.service.CategoryService;
+import com.liuyang.admin.service.FileService;
 import com.liuyang.admin.service.ProductService;
+import com.liuyang.admin.vo.FileUploadVO;
 import com.liuyang.admin.vo.PageVO;
 import com.liuyang.admin.vo.ProductVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -41,10 +44,14 @@ public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final FileService fileService;
 
-    public ProductController(ProductService productService, CategoryService categoryService) {
+    public ProductController(ProductService productService,
+                             CategoryService categoryService,
+                             FileService fileService) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.fileService = fileService;
     }
 
     @Operation(summary = "分页查询商品", description = "支持名称模糊、分类、状态、价格区间筛选")
@@ -108,6 +115,17 @@ public class ProductController {
             @Parameter(description = "商品 ID") @PathVariable Long id,
             @Valid @RequestBody ProductStatusUpdateDTO dto) {
         Product product = productService.updateStatus(id, dto.getStatus());
+        return Result.success(toVO(product));
+    }
+
+    @Operation(summary = "上传并绑定商品封面", description = "上传图片后自动写入商品 coverUrl，等价于先调 /api/files/upload 再更新 coverUrl")
+    @RequirePermission("product:write")
+    @PostMapping("/{id}/cover")
+    public Result<ProductVO> uploadCover(
+            @Parameter(description = "商品 ID") @PathVariable Long id,
+            @Parameter(description = "封面图片") @RequestParam("file") MultipartFile file) {
+        FileUploadVO upload = fileService.upload(file);   // 复用 Day8 上传
+        Product product = productService.updateCover(id, upload.getUrl());  // 绑定 + 校验
         return Result.success(toVO(product));
     }
 

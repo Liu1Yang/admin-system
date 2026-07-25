@@ -20,5 +20,7 @@ public interface ProductService {
 
     Product updateStatus(Long id, Integer status);
 
+    Product updateCover(Long id, String coverUrl);
+
     void delete(Long id);
 }

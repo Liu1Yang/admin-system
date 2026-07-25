@@ -27,7 +27,7 @@ public class ProductUpdateDTO {
     @Min(value = 0, message = "库存不能为负数")
     private Integer stock;
 
-    @Schema(description = "封面图 URL")
+    @Schema(description = "封面图 URL（须 /uploads/ 开头）")
     @Size(max = 255, message = "封面图 URL 最长 255")
     private String coverUrl;
 

@@ -9,6 +9,7 @@ import com.liuyang.admin.entity.Product;
 import com.liuyang.admin.mapper.ProductMapper;
 import com.liuyang.admin.service.CategoryService;
 import com.liuyang.admin.service.ProductService;
+import com.liuyang.admin.service.cache.ProductCacheService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -19,13 +20,18 @@ public class ProductServiceImpl implements ProductService {
 
     private static final int STATUS_OFF = 0;
     private static final int STATUS_ON = 1;
+    private static final String COVER_URL_PREFIX = "/uploads/";
 
     private final ProductMapper productMapper;
     private final CategoryService categoryService;
+    private final ProductCacheService productCacheService;
 
-    public ProductServiceImpl(ProductMapper productMapper, CategoryService categoryService) {
+    public ProductServiceImpl(ProductMapper productMapper,
+                              CategoryService categoryService,
+                              ProductCacheService productCacheService) {
         this.productMapper = productMapper;
         this.categoryService = categoryService;
+        this.productCacheService = productCacheService;
     }
 
     @Override
@@ -58,16 +64,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getById(Long id) {
+        Product cached = productCacheService.getById(id);
+        if (cached != null) {
+            return cached;
+        }
+
         Product product = productMapper.selectById(id);
         if (product == null) {
             throw new BusinessException(404, "商品不存在");
         }
+        productCacheService.set(product);
         return product;
     }
 
     @Override
     public Product create(ProductCreateDTO dto, Long creatorId) {
         validateCategory(dto.getCategoryId());
+        validateCoverUrl(dto.getCoverUrl());
 
         Product product = new Product();
         product.setName(dto.getName());
@@ -79,6 +92,7 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(dto.getDescription());
         product.setCreatorId(creatorId);
         productMapper.insert(product);
+        productCacheService.set(product);
         return product;
     }
 
@@ -103,6 +117,7 @@ public class ProductServiceImpl implements ProductService {
             product.setStock(dto.getStock());
         }
         if (dto.getCoverUrl() != null) {
+            validateCoverUrl(dto.getCoverUrl());
             product.setCoverUrl(dto.getCoverUrl());
         }
         if (dto.getDescription() != null) {
@@ -110,6 +125,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productMapper.updateById(product);
+        productCacheService.delete(id);
         return product;
     }
 
@@ -124,6 +140,17 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStatus(status);
         productMapper.updateById(product);
+        productCacheService.delete(id);
+        return product;
+    }
+
+    @Override
+    public Product updateCover(Long id, String coverUrl) {
+        validateCoverUrl(coverUrl);
+        Product product = getById(id);
+        product.setCoverUrl(coverUrl);
+        productMapper.updateById(product);
+        productCacheService.delete(id);
         return product;
     }
 
@@ -131,6 +158,7 @@ public class ProductServiceImpl implements ProductService {
     public void delete(Long id) {
         getById(id);
         productMapper.deleteById(id);
+        productCacheService.delete(id);
     }
 
     private void validateCategory(Long categoryId) {
@@ -140,6 +168,15 @@ public class ProductServiceImpl implements ProductService {
     private void validateStatus(Integer status) {
         if (status == null || (status != STATUS_OFF && status != STATUS_ON)) {
             throw new BusinessException(400, "status 只能为 0 或 1");
+        }
+    }
+
+    private void validateCoverUrl(String coverUrl) {
+        if (!StringUtils.hasText(coverUrl)) {
+            return;
+        }
+        if (!coverUrl.startsWith(COVER_URL_PREFIX)) {
+            throw new BusinessException(400, "封面图须为本系统上传的文件（/uploads/ 开头）");
         }
     }
 }
