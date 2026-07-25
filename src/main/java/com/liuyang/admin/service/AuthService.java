@@ -13,4 +13,6 @@ public interface AuthService {
     UserVO register(UserCreateDTO dto);
 
     CurrentUserVO getCurrentUser(Long userId);
+
+    void logout(String token);
 }

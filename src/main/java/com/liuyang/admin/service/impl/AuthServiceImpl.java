@@ -13,11 +13,13 @@ import com.liuyang.admin.mapper.RoleMapper;
 import com.liuyang.admin.mapper.UserMapper;
 import com.liuyang.admin.service.AuthService;
 import com.liuyang.admin.service.UserService;
+import com.liuyang.admin.service.cache.TokenBlacklistService;
 import com.liuyang.admin.vo.CurrentUserVO;
 import com.liuyang.admin.vo.LoginVO;
 import com.liuyang.admin.vo.PermissionVO;
 import com.liuyang.admin.vo.RoleVO;
 import com.liuyang.admin.vo.UserVO;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,19 +36,22 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public AuthServiceImpl(UserMapper userMapper,
                            RoleMapper roleMapper,
                            PermissionMapper permissionMapper,
                            UserService userService,
                            PasswordEncoder passwordEncoder,
-                           JwtUtil jwtUtil) {
+                           JwtUtil jwtUtil,
+                           TokenBlacklistService tokenBlacklistService) {
         this.userMapper = userMapper;
         this.roleMapper = roleMapper;
         this.permissionMapper = permissionMapper;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -77,6 +82,16 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(404, "用户不存在");
         }
         return buildCurrentUserVO(user);
+    }
+
+    @Override
+    public void logout(String token) {
+        try {
+            long ttlSeconds = jwtUtil.getRemainingSeconds(token);
+            tokenBlacklistService.add(token, ttlSeconds);
+        } catch (JwtException e) {
+            // Token 已过期，无需加入黑名单
+        }
     }
 
     private CurrentUserVO buildCurrentUserVO(User user) {

@@ -47,4 +47,13 @@ public class JwtUtil {   // JWT 工具类：专门负责 生成 Token 和 解析
     public Long getUserId(String token) {  //  从 Token 取用户 ID
         return Long.valueOf(parseToken(token).getSubject());
     }
+
+    /**
+     * Token 剩余有效秒数（用于黑名单 TTL）
+     */
+    public long getRemainingSeconds(String token) {
+        Date expiration = parseToken(token).getExpiration();
+        long seconds = (expiration.getTime() - System.currentTimeMillis()) / 1000;
+        return Math.max(seconds, 1L);
+    }
 }

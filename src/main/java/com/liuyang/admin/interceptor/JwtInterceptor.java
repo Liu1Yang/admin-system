@@ -3,6 +3,7 @@ package com.liuyang.admin.interceptor;
 import com.liuyang.admin.common.BusinessException;
 import com.liuyang.admin.common.JwtUtil;
 import com.liuyang.admin.common.UserContext;
+import com.liuyang.admin.service.cache.TokenBlacklistService;
 import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -18,9 +19,11 @@ public class JwtInterceptor implements HandlerInterceptor {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    public JwtInterceptor(JwtUtil jwtUtil) {
+    public JwtInterceptor(JwtUtil jwtUtil, TokenBlacklistService tokenBlacklistService) {
         this.jwtUtil = jwtUtil;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -28,6 +31,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = resolveToken(request);   // ① 从 Header 取 Token
         if (!StringUtils.hasText(token)) {    // ② 没 Token → 401
             throw new BusinessException(401, "未登录，请先登录");
+        }
+
+        if (tokenBlacklistService.isBlacklisted(token)) { // 是否在黑名单
+            throw new BusinessException(401, "Token 已失效，请重新登录");
         }
 
         try {

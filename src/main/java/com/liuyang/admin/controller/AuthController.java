@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Tag(name = "认证")
@@ -47,5 +48,23 @@ public class AuthController {
     @GetMapping("/me")
     public Result<CurrentUserVO> me() {
         return Result.success(authService.getCurrentUser(UserContext.getUserId()));
+    }
+
+    @Operation(summary = "用户登出", description = "将当前 Token 加入 Redis 黑名单，之后该 Token 不可再使用")
+    @PostMapping("/logout")
+    public Result<Void> logout(HttpServletRequest request) {
+        String token = resolveToken(request);
+        if (token != null) {
+            authService.logout(token);
+        }
+        return Result.success();
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
     }
 }

@@ -20,7 +20,7 @@
 - 登录 / 当前用户接口返回角色与权限列表
 - 商品分类树形 CRUD
 - 商品 CRUD（关联分类、默认下架）、分页多条件搜索、上下架与库存校验、封面图上传、详情 Redis 缓存
-- JWT 无状态鉴权
+- JWT 无状态鉴权，Redis Token 黑名单实现登出失效
 - Redis 缓存用户信息、商品详情
 - 统一返回、全局异常、参数校验
 - Knife4j 接口文档
@@ -37,13 +37,15 @@
 
 ### 1. 初始化数据库
 
-执行 `sql/init.sql`。若已有旧数据，再执行 `sql/update-password-bcrypt.sql`（测试账号密码仍为 `123456`）。
+按顺序执行（清单见 `sql/init-phase-a-order.md`）：
 
-执行 `sql/rbac.sql` 初始化角色权限表（admin → 管理员，liuyang → 普通用户）。
-
-执行 `sql/category.sql` 初始化商品分类表。
-
-执行 `sql/product.sql` 初始化商品表。
+```text
+sql/init.sql
+sql/update-password-bcrypt.sql   ← 测试账号密码仍为 123456
+sql/rbac.sql
+sql/category.sql
+sql/product.sql
+```
 
 ### 2. 修改配置
 
@@ -78,7 +80,7 @@ java -jar target/admin-system-1.0.0.jar
 
 | 模块 | 接口 |
 |------|------|
-| 认证 | POST `/api/auth/login`、`/api/auth/register`、GET `/api/auth/me` |
+| 认证 | POST `/api/auth/login`、`/api/auth/register`、POST `/api/auth/logout`、GET `/api/auth/me` |
 | 用户 | GET `/api/users`（分页）、CRUD `/api/users/{id}` |
 | 角色 | GET `/api/roles`、POST `/api/roles`、GET `/api/roles/{id}` |
 | 用户角色 | GET `/api/users/{id}/roles`、POST `/api/users/{id}/roles` |
@@ -92,7 +94,39 @@ java -jar target/admin-system-1.0.0.jar
 Authorization: Bearer {token}
 ```
 
-## RBAC 联调（Day13）
+## 项目架构（阶段 A）
+
+```text
+Client (Postman / 未来 Vue)
+        │  Authorization: Bearer {token}
+        ▼
+┌───────────────────────────────────────────┐
+│  Interceptor 链                            │
+│  JwtInterceptor → PermissionInterceptor   │
+│  (+ Redis Token 黑名单校验)                  │
+└───────────────────────────────────────────┘
+        ▼
+ Controller → Service → Mapper → MySQL
+        │              ↘ Redis（用户/商品缓存、Token 黑名单）
+        ▼
+ Result<T> 统一返回 + GlobalExceptionHandler
+```
+
+**核心表：** user、role、permission、user_role、role_permission、category、product
+
+## 阶段 A 联调（Day20）
+
+1. 启动 MySQL + Redis，按上文顺序执行 SQL
+2. `mvn spring-boot:run` 或 IDEA 运行 `AdminApplication`
+3. Postman 导入：
+   - `postman/PhaseA.postman_collection.json` — **全链路联调（推荐）**
+   - `postman/RBAC.postman_collection.json` — RBAC 专项（Day13）
+4. 按文件夹顺序跑 PhaseA：**1-认证 → 2-分类 → 3-商品 → 4-登出黑名单**
+5. 全部 Test 通过 = 阶段 A 后端联调完成
+
+> 业务错误时 HTTP 状态码仍为 200，请看响应 JSON 里的 `code` 字段（401/403/404 等）。
+
+## RBAC 专项联调（Day13）
 
 1. 启动项目，确认已执行 `sql/rbac.sql`
 2. Postman → Import → 选择 `postman/RBAC.postman_collection.json`
@@ -101,7 +135,28 @@ Authorization: Bearer {token}
 
 > 业务错误时 HTTP 状态码仍为 200，请看响应 JSON 里的 `code` 字段（401/403 等）。
 
-## 简历项目描述（可直接改写）
+## 简历项目描述（阶段 A 完整版，可直接改写）
+
+**项目名称：** 企业级后台管理系统
+
+**技术栈：** Spring Boot 2.7、MyBatis-Plus、MySQL、Redis、JWT、BCrypt、Knife4j、Maven
+
+**项目描述：**
+
+- 基于 Spring Boot 构建 RESTful 后台管理系统，采用 Controller-Service-Mapper 分层架构
+- 设计 RBAC 权限模型（用户-角色-权限），自定义注解 + 拦截器实现接口级鉴权（401/403）
+- 使用 JWT 无状态登录，Redis Token 黑名单实现登出失效；BCrypt 加密存储密码
+- 实现商品模块：分类树、商品 CRUD、分页多条件搜索、上下架与库存业务校验
+- 封装 Redis Cache-Aside 缓存用户/商品热点数据，更新删除时主动失效
+- 统一返回体、全局异常、参数校验；集成 Knife4j 接口文档；支持本地图片上传
+
+**个人职责（按实际改写）：**
+
+- 独立完成用户、权限、商品等模块设计与 REST API 开发
+- 设计 7 张业务表及关联关系，编写 MyBatis-Plus 数据访问层
+- 使用 Postman 完成 RBAC 与商品全链路联调
+
+## 简历项目描述（Day8 基础版，已被上方替代）
 
 **项目名称：** 后台管理系统
 
@@ -109,12 +164,7 @@ Authorization: Bearer {token}
 
 **项目描述：**
 
-- 基于 Spring Boot 构建 RESTful 后台管理系统，采用 Controller-Service-Mapper 分层架构
-- 使用 JWT 实现无状态登录鉴权，BCrypt 加密存储用户密码
-- 使用 MyBatis-Plus 完成用户 CRUD、分页查询与条件搜索
-- 封装 Redis 缓存用户热点数据，更新/删除时主动失效缓存
-- 统一异常处理与参数校验，集成 Knife4j 自动生成接口文档
-- 支持本地图片上传与静态资源访问
+- 基于 Spring Boot 构建 RESTful 后台管理系统（早期版本，功能较少）
 
 ## 学习进度
 
