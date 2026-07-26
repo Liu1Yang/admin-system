@@ -7,3 +7,7 @@ export function login(data) {
 export function getCurrentUser() {
   return request.get('/api/auth/me')
 }
+
+export function logout() {
+  return request.post('/api/auth/logout')
+}

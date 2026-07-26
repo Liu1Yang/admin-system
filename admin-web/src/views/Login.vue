@@ -1,9 +1,11 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { login } from '../api/auth'
+import { setAuth } from '../utils/auth'
 
+const route = useRoute()
 const router = useRouter()
 const loading = ref(false)
 const form = reactive({
@@ -19,10 +21,10 @@ async function handleLogin() {
   loading.value = true
   try {
     const res = await login(form)
-    localStorage.setItem('token', res.data.token)
-    localStorage.setItem('user', JSON.stringify(res.data.user))
+    setAuth(res.data.token, res.data.user)
     ElMessage.success('登录成功')
-    router.push('/')
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    router.push(redirect)
   } catch (e) {
     // 错误已在 axios 拦截器提示
   } finally {
@@ -35,7 +37,7 @@ async function handleLogin() {
   <div class="login-page">
     <el-card class="login-card" shadow="hover">
       <h2 class="title">admin-system</h2>
-      <p class="subtitle">后台管理系统 · Day23 联调</p>
+      <p class="subtitle">后台管理系统 · Day24 登录鉴权</p>
       <el-form label-width="70px" @submit.prevent="handleLogin">
         <el-form-item label="用户名">
           <el-input v-model="form.username" placeholder="admin" />

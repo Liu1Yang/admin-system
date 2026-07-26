@@ -1,4 +1,5 @@
 # 根目录
+.idea/
 target/
 uploads/
 *.iml
@@ -6,6 +7,7 @@ uploads/
 # 后端
 admin-system/target/
 admin-system/uploads/
+admin-system/.idea/
 
 # 前端
 admin-web/node_modules/

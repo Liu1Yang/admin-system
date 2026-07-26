@@ -1,31 +1,14 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getCurrentUser } from '../api/auth'
+import { getCurrentUser, logout } from '../api/auth'
+import { clearAuth, getUser } from '../utils/auth'
 
 const router = useRouter()
+const loggingOut = ref(false)
 
-const user = computed(() => {
-  const raw = localStorage.getItem('user')
-  if (!raw) return null
-  try {
-    return JSON.parse(raw)
-  } catch {
-    return null
-  }
-})
-
-function goLogin() {
-  router.push('/login')
-}
-
-function logoutLocal() {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
-  ElMessage.success('已清除本地登录态（Day24 接后端 logout）')
-  router.push('/login')
-}
+const user = computed(() => getUser())
 
 async function testMe() {
   try {
@@ -35,23 +18,34 @@ async function testMe() {
     // handled
   }
 }
+
+async function handleLogout() {
+  loggingOut.value = true
+  try {
+    await logout()
+    ElMessage.success('已登出，Token 已加入黑名单')
+  } catch (e) {
+    ElMessage.warning('登出接口失败，已清除本地登录态')
+  } finally {
+    clearAuth()
+    loggingOut.value = false
+    router.push('/login')
+  }
+}
 </script>
 
 <template>
   <div class="home-page">
     <el-card class="home-card">
-      <h2>Vue 前端骨架已就绪</h2>
+      <h2>Day24 · 路由守卫 + 登出</h2>
       <template v-if="user">
         <p>当前用户：<strong>{{ user.username }}</strong></p>
-        <p>角色：{{ user.roles?.map(r => r.name).join('、') || '无' }}</p>
-        <el-space>
-          <el-button type="primary" @click="testMe">测试 GET /api/auth/me（CORS）</el-button>
-          <el-button @click="logoutLocal">退出（本地）</el-button>
+        <p>角色：{{ user.roles?.map((r) => r.name).join('、') || '无' }}</p>
+        <p class="hint">未登录访问首页会自动跳转 /login；Token 失效时接口 401 也会跳回登录页。</p>
+        <el-space wrap>
+          <el-button type="primary" @click="testMe">测试 GET /api/auth/me</el-button>
+          <el-button type="danger" :loading="loggingOut" @click="handleLogout">登出</el-button>
         </el-space>
-      </template>
-      <template v-else>
-        <p>尚未登录</p>
-        <el-button type="primary" @click="goLogin">去登录</el-button>
       </template>
     </el-card>
   </div>
@@ -66,6 +60,12 @@ async function testMe() {
 }
 
 .home-card {
-  width: 520px;
+  width: 560px;
+}
+
+.hint {
+  color: #909399;
+  font-size: 14px;
+  line-height: 1.6;
 }
 </style>
