@@ -28,6 +28,11 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // 浏览器跨域预检不带 Token，必须放行 OPTIONS
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String token = resolveToken(request);   // ① 从 Header 取 Token
         if (!StringUtils.hasText(token)) {    // ② 没 Token → 401
             throw new BusinessException(401, "未登录，请先登录");
