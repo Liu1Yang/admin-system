@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getToken } from '../utils/auth'
+import { getToken, hasPermission } from '../utils/auth'
+import AdminLayout from '../layout/AdminLayout.vue'
 import Login from '../views/Login.vue'
-import Home from '../views/Home.vue'
+import Dashboard from '../views/Dashboard.vue'
+import PlaceholderPage from '../views/PlaceholderPage.vue'
 
 const routes = [
   {
@@ -12,9 +14,40 @@ const routes = [
   },
   {
     path: '/',
-    name: 'Home',
-    component: Home,
-    meta: { requiresAuth: true }
+    component: AdminLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'Dashboard',
+        component: Dashboard,
+        meta: { title: '首页' }
+      },
+      {
+        path: 'users',
+        name: 'Users',
+        component: PlaceholderPage,
+        meta: { title: '用户管理', permission: 'user:delete' }
+      },
+      {
+        path: 'roles',
+        name: 'Roles',
+        component: PlaceholderPage,
+        meta: { title: '角色管理', permission: 'role:assign' }
+      },
+      {
+        path: 'categories',
+        name: 'Categories',
+        component: PlaceholderPage,
+        meta: { title: '分类管理', permission: 'product:write' }
+      },
+      {
+        path: 'products',
+        name: 'Products',
+        component: PlaceholderPage,
+        meta: { title: '商品管理', permission: 'product:write' }
+      }
+    ]
   }
 ]
 
@@ -36,6 +69,10 @@ router.beforeEach((to) => {
   if (to.meta.guest && token) {
     const redirect = typeof to.query.redirect === 'string' ? to.query.redirect : '/'
     return redirect
+  }
+
+  if (to.meta.permission && !hasPermission(to.meta.permission)) {
+    return '/'
   }
 
   return true

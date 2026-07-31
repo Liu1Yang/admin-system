@@ -37,7 +37,7 @@ async function handleLogin() {
   <div class="login-page">
     <el-card class="login-card" shadow="hover">
       <h2 class="title">admin-system</h2>
-      <p class="subtitle">后台管理系统 · Day24 登录鉴权</p>
+      <p class="subtitle">后台管理系统 · Day25 Layout</p>
       <el-form label-width="70px" @submit.prevent="handleLogin">
         <el-form-item label="用户名">
           <el-input v-model="form.username" placeholder="admin" />
