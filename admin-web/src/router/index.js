@@ -4,6 +4,7 @@ import AdminLayout from '../layout/AdminLayout.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import UserList from '../views/user/UserList.vue'
+import RoleList from '../views/role/RoleList.vue'
 import PlaceholderPage from '../views/PlaceholderPage.vue'
 
 const routes = [
@@ -33,7 +34,7 @@ const routes = [
       {
         path: 'roles',
         name: 'Roles',
-        component: PlaceholderPage,
+        component: RoleList,
         meta: { title: '角色管理', permission: 'role:assign' }
       },
       {

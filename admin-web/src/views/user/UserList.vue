@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { deleteUser, getUserPage } from '../../api/user'
+import { deleteUser, getUserPage, getUserRoles, assignUserRoles } from '../../api/user'
+import { getRoleList } from '../../api/role'
 import { hasPermission } from '../../utils/auth'
 
 const loading = ref(false)
@@ -21,8 +22,15 @@ const pagination = reactive({
 })
 
 const canDelete = hasPermission('user:delete')
+const canAssignRole = hasPermission('role:assign')
 
-async function fetchList() {
+const roleDialogVisible = ref(false)
+const roleSubmitting = ref(false)
+const allRoles = ref([])
+const selectedRoleIds = ref([])
+const currentUser = ref(null)
+
+async function fetchList() { //  列表查询（稳定输出） 从后端拉取表格数据并更新到前端的状态中。
   loading.value = true
   try {
     const res = await getUserPage({
@@ -83,10 +91,41 @@ async function handleDelete(row) {
   }
 }
 
+async function openRoleDialog(row) {  // 并行获取数据 点击“分配角色”按钮时，同时拉取“所有可选角色”和“当前用户已有的角色”。
+  currentUser.value = row
+  roleDialogVisible.value = true
+  try {
+    const [rolesRes, userRolesRes] = await Promise.all([
+      getRoleList(),
+      getUserRoles(row.id)
+    ])
+    allRoles.value = rolesRes.data || []
+    selectedRoleIds.value = (userRolesRes.data || []).map((r) => r.id)
+  } catch (e) {
+    roleDialogVisible.value = false
+  }
+}
+
+async function handleAssignRoles() {
+  if (!currentUser.value) return
+  roleSubmitting.value = true
+  try {
+    await assignUserRoles(currentUser.value.id, selectedRoleIds.value)
+    ElMessage.success('角色绑定成功')
+    roleDialogVisible.value = false
+  } catch (e) {
+    // handled
+  } finally {
+    roleSubmitting.value = false
+  }
+}
+
 function formatTime(value) {
   if (!value) return '-'
   return String(value).replace('T', ' ')
 }
+
+const showActions = canDelete || canAssignRole
 
 onMounted(fetchList)
 </script>
@@ -116,9 +155,14 @@ onMounted(fetchList)
       <el-table-column label="创建时间" min-width="180">
         <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
       </el-table-column>
-      <el-table-column v-if="canDelete" label="操作" width="100" fixed="right">
+      <el-table-column v-if="showActions" label="操作" width="160" fixed="right">
         <template #default="{ row }">
-          <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+          <el-button v-if="canAssignRole" type="primary" link @click="openRoleDialog(row)">
+            绑角色
+          </el-button>
+          <el-button v-if="canDelete" type="danger" link @click="handleDelete(row)">
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,6 +179,26 @@ onMounted(fetchList)
         @size-change="handleSizeChange"
       />
     </div>
+
+    <el-dialog
+      v-model="roleDialogVisible"
+      :title="`绑定角色 - ${currentUser?.username || ''}`"
+      width="460px"
+      destroy-on-close
+    >
+      <el-checkbox-group v-model="selectedRoleIds">
+        <el-checkbox v-for="role in allRoles" :key="role.id" :value="role.id">
+          {{ role.name }}（{{ role.code }}）
+        </el-checkbox>
+      </el-checkbox-group>
+      <p v-if="!allRoles.length" class="empty-tip">暂无角色，请先在角色管理页创建</p>
+      <template #footer>
+        <el-button @click="roleDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="roleSubmitting" @click="handleAssignRoles">
+          保存
+        </el-button>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -143,5 +207,16 @@ onMounted(fetchList)
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.el-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-tip {
+  color: #909399;
+  font-size: 14px;
 }
 </style>

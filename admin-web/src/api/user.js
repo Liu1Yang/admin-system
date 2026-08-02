@@ -7,3 +7,11 @@ export function getUserPage(params) {
 export function deleteUser(id) {
   return request.delete(`/api/users/${id}`)
 }
+
+export function getUserRoles(userId) {
+  return request.get(`/api/users/${userId}/roles`)
+}
+
+export function assignUserRoles(userId, roleIds) {
+  return request.post(`/api/users/${userId}/roles`, { roleIds })
+}
