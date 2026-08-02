@@ -22,7 +22,7 @@ function redirectToLogin() {
   })
 }
 
-request.interceptors.request.use((config) => {
+request.interceptors.request.use((config) => {   // “发件前检查站”
   const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -30,7 +30,7 @@ request.interceptors.request.use((config) => {
   return config
 })
 
-request.interceptors.response.use(
+request.interceptors.response.use(   // “收件后处理站”
   (response) => {
     const result = response.data
     if (result.code === 401) {

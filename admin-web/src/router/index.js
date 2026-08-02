@@ -3,6 +3,7 @@ import { getToken, hasPermission } from '../utils/auth'
 import AdminLayout from '../layout/AdminLayout.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
+import UserList from '../views/user/UserList.vue'
 import PlaceholderPage from '../views/PlaceholderPage.vue'
 
 const routes = [
@@ -26,7 +27,7 @@ const routes = [
       {
         path: 'users',
         name: 'Users',
-        component: PlaceholderPage,
+        component: UserList,
         meta: { title: '用户管理', permission: 'user:delete' }
       },
       {
