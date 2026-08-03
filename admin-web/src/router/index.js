@@ -6,7 +6,7 @@ import Dashboard from '../views/Dashboard.vue'
 import UserList from '../views/user/UserList.vue'
 import RoleList from '../views/role/RoleList.vue'
 import CategoryTree from '../views/category/CategoryTree.vue'
-import PlaceholderPage from '../views/PlaceholderPage.vue'
+import ProductList from '../views/product/ProductList.vue'
 
 const routes = [
   {
@@ -47,7 +47,7 @@ const routes = [
       {
         path: 'products',
         name: 'Products',
-        component: PlaceholderPage,
+        component: ProductList,
         meta: { title: '商品管理', permission: 'product:write' }
       }
     ]
