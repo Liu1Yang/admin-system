@@ -29,13 +29,12 @@ npm run dev
 
 `.env.development` 默认 **留空** `VITE_API_BASE_URL`，请求走 Vite 代理（`/api` → `8080`），开发时无 CORS 问题。
 
-## Day27 验收
+## Day28 验收
 
-1. `admin` 登录 → 「角色管理」展示 ADMIN、USER 等角色
-2. 点击「新增角色」→ 填写编码/名称 → 创建成功
-3. 「用户管理」→ 对 liuyang 点「绑角色」→ 勾选 ADMIN → 保存
-4. liuyang 重新登录 → 首页权限列表变化，侧边栏菜单增多
-5. 可再把 liuyang 改回 USER 角色验证覆盖式绑定
+1. `admin` 登录 → 「分类管理」展示树形结构（数码 → 手机/电脑，服装等）
+2. 选中「数码」→「新增子分类」→ 创建成功并出现在树下
+3. 选中节点 →「编辑」→ 修改名称/排序 → 保存生效
+4. 删除有子节点的分类 → 后端拒绝并提示；删除叶子节点 → 成功
 
 ## 目录
 
@@ -46,7 +45,7 @@ src/
 ├── layout/       AdminLayout 布局
 ├── router/       路由 + 守卫
 ├── utils/        auth、routerHolder
-├── views/        页面（user/UserList.vue 等）
+├── views/        页面（user/、role/、category/ 等）
 ├── App.vue
 └── main.js
 ```

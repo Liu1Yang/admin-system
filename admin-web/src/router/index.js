@@ -5,6 +5,7 @@ import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import UserList from '../views/user/UserList.vue'
 import RoleList from '../views/role/RoleList.vue'
+import CategoryTree from '../views/category/CategoryTree.vue'
 import PlaceholderPage from '../views/PlaceholderPage.vue'
 
 const routes = [
@@ -40,7 +41,7 @@ const routes = [
       {
         path: 'categories',
         name: 'Categories',
-        component: PlaceholderPage,
+        component: CategoryTree,
         meta: { title: '分类管理', permission: 'product:write' }
       },
       {
