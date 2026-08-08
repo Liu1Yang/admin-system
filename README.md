@@ -1,39 +1,55 @@
-# admin-system（Monorepo）
+# LiuYang 学习仓库
 
-前后端分离后台管理系统，用于学习与求职作品展示。
+Spring Boot + Vue3 前后端分离后台管理系统。
 
 | 目录 | 说明 |
 |------|------|
 | [admin-system/](admin-system/) | 后端 API（Spring Boot 2.7 + MyBatis-Plus + MySQL + Redis + JWT） |
 | [admin-web/](admin-web/) | 管理端前端（Vue3 + Vite + Element Plus） |
+| [docs/phase-b-demo.md](docs/phase-b-demo.md) | **Day31 联调演示脚本 + 录屏提纲 + 简历描述** |
 
 ## 快速启动
 
-### 后端
-
 ```bash
+# 1. MySQL + Redis，按 admin-system/sql/init-phase-a-order.md 执行 SQL
+
+# 2. 后端
 cd admin-system
-# 按 admin-system/sql/init-phase-a-order.md 顺序执行 SQL
 mvn spring-boot:run
-```
 
-文档：http://localhost:8080/doc.html
-
-### 前端
-
-```bash
+# 3. 前端
 cd admin-web
 npm install
 npm run dev
 ```
 
-访问：http://localhost:5173
+- 前端：http://localhost:5173
+- 接口文档：http://localhost:8080/doc.html
+- 测试账号：admin / liuyang，密码 **123456**
 
-## 环境要求
+## 学习进度
 
-- JDK 8+、Maven 3.6+
-- MySQL 5.7+ / 8.0
-- Redis 5.0+
-- Node.js 18+（前端）
+### 阶段 A（Day1–Day20）✅ 后端
 
-详细说明见各子目录 README。
+RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
+
+### 阶段 B1–B2（Day23–Day31）✅ 前端 + 联调
+
+- [x] Day23：CORS + Vue 项目骨架
+- [x] Day24：登录 + Token + 路由守卫
+- [x] Day25：Layout + 权限菜单
+- [x] Day26：用户列表（分页、搜索）
+- [x] Day27：角色管理 + 用户绑角色
+- [x] Day28：分类树 CRUD
+- [x] Day29：商品列表（多条件搜索）
+- [x] Day30：商品表单（新增/编辑、封面、上下架）
+- [x] Day31：联调收尾 + 演示脚本（见 docs/phase-b-demo.md）
+
+### 阶段 B3+（未开始）
+
+- [ ] Day32–34：Docker Compose 部署
+- [ ] Day35–38：单元测试、双 Token、限流等
+
+## IDEA 打开方式
+
+打开 **`D:\project\study`** 作为项目根目录（不是 admin-system 子目录）。
