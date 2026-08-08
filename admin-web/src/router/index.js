@@ -7,6 +7,7 @@ import UserList from '../views/user/UserList.vue'
 import RoleList from '../views/role/RoleList.vue'
 import CategoryTree from '../views/category/CategoryTree.vue'
 import ProductList from '../views/product/ProductList.vue'
+import ProductForm from '../views/product/ProductForm.vue'
 
 const routes = [
   {
@@ -49,6 +50,18 @@ const routes = [
         name: 'Products',
         component: ProductList,
         meta: { title: '商品管理', permission: 'product:write' }
+      },
+      {
+        path: 'products/create',
+        name: 'ProductCreate',
+        component: ProductForm,
+        meta: { title: '新增商品', permission: 'product:write' }
+      },
+      {
+        path: 'products/:id/edit',
+        name: 'ProductEdit',
+        component: ProductForm,
+        meta: { title: '编辑商品', permission: 'product:write' }
       }
     ]
   }

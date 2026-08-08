@@ -1,9 +1,13 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getCategoryTree } from '../../api/category'
 import { deleteProduct, getProductPage, updateProductStatus } from '../../api/product'
+import { flattenCategories } from '../../utils/category'
 import { hasPermission } from '../../utils/auth'
+
+const router = useRouter()
 
 const loading = ref(false)
 const tableData = ref([])
@@ -28,16 +32,12 @@ const pagination = reactive({  // pagination:分页
 
 const canDelete = hasPermission('product:delete')
 
-function flattenCategories(nodes, prefix = '') {
-  const result = []
-  for (const node of nodes || []) {
-    const label = prefix ? `${prefix} / ${node.name}` : node.name
-    result.push({ id: node.id, label })
-    if (node.children?.length) {
-      result.push(...flattenCategories(node.children, label))
-    }
-  }
-  return result
+function goCreate() {
+  router.push('/products/create')
+}
+
+function goEdit(row) {
+  router.push(`/products/${row.id}/edit`)
 }
 
 async function loadCategories() {
@@ -154,6 +154,10 @@ onMounted(async () => {
 
 <template>
   <el-card shadow="never">
+    <div class="toolbar">
+      <el-button type="primary" @click="goCreate">新增商品</el-button>
+    </div>
+
     <el-form :inline="true" @submit.prevent="handleSearch">
       <el-form-item label="商品名称">
         <el-input
@@ -241,8 +245,9 @@ onMounted(async () => {
       <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.createTime) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="140" fixed="right">
+      <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
+          <el-button type="primary" link @click="goEdit(row)">编辑</el-button>
           <el-button type="primary" link @click="handleToggleStatus(row)">
             {{ row.status === 1 ? '下架' : '上架' }}
           </el-button>
@@ -269,6 +274,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.toolbar {
+  margin-bottom: 16px;
+}
+
 .price-sep {
   margin: 0 6px;
   color: #909399;
