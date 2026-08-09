@@ -1,6 +1,8 @@
 -- RBAC 权限表（在 init.sql 已执行后运行）
 USE admin_system;
 
+SET NAMES utf8mb4;
+
 -- 角色表
 CREATE TABLE IF NOT EXISTS role (
     id          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键',

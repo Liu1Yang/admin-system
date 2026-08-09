@@ -1,6 +1,8 @@
 -- 商品表（在 category.sql 已执行后运行）
 USE admin_system;
 
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS product (
     id          BIGINT         NOT NULL AUTO_INCREMENT COMMENT '主键',
     name        VARCHAR(100)   NOT NULL COMMENT '商品名称',

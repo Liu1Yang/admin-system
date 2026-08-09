@@ -6,9 +6,22 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 |------|------|
 | [admin-system/](admin-system/) | 后端 API（Spring Boot 2.7 + MyBatis-Plus + MySQL + Redis + JWT） |
 | [admin-web/](admin-web/) | 管理端前端（Vue3 + Vite + Element Plus） |
-| [docs/phase-b-demo.md](docs/phase-b-demo.md) | **Day31 联调演示脚本 + 录屏提纲 + 简历描述** |
+| [docs/phase-b-demo.md](docs/phase-b-demo.md) | Day31 联调演示脚本 + 录屏提纲 + 简历描述 |
+| [docs/docker.md](docs/docker.md) | Day32 Docker Compose 部署指南 |
+| [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
+
+### 方式一：Docker（Day32，推荐演示/部署）
+
+```bash
+# 在 study 根目录
+docker compose up -d --build
+```
+
+详见 [docs/docker.md](docs/docker.md)。后端：http://localhost:8080
+
+### 方式二：本地开发
 
 ```bash
 # 1. MySQL + Redis，按 admin-system/sql/init-phase-a-order.md 执行 SQL
@@ -45,9 +58,13 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 - [x] Day30：商品表单（新增/编辑、封面、上下架）
 - [x] Day31：联调收尾 + 演示脚本（见 docs/phase-b-demo.md）
 
-### 阶段 B3+（未开始）
+### 阶段 B3 部署（进行中）
 
-- [ ] Day32–34：Docker Compose 部署
+- [x] Day32：Docker Compose（MySQL + Redis + 应用，见 docs/docker.md）
+- [ ] Day33：`application-prod.yml` + 启动文档
+- [ ] Day34：jar 打包 + Docker 一键启动验证
+
+### 阶段 B3+（未开始）
 - [ ] Day35–38：单元测试、双 Token、限流等
 
 ## IDEA 打开方式

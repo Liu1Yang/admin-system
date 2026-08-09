@@ -4,6 +4,8 @@ CREATE DATABASE IF NOT EXISTS admin_system
 
 USE admin_system;
 
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS user (
     id          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键',
     username    VARCHAR(50)  NOT NULL COMMENT '用户名',

@@ -1,0 +1,67 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: admin-mysql
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: admin_system
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./admin-system/sql/00-charset.sql:/docker-entrypoint-initdb.d/00-charset.sql:ro
+      - ./admin-system/sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./admin-system/sql/update-password-bcrypt.sql:/docker-entrypoint-initdb.d/02-update-password-bcrypt.sql:ro
+      - ./admin-system/sql/rbac.sql:/docker-entrypoint-initdb.d/03-rbac.sql:ro
+      - ./admin-system/sql/category.sql:/docker-entrypoint-initdb.d/04-category.sql:ro
+      - ./admin-system/sql/product.sql:/docker-entrypoint-initdb.d/05-product.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p123456"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: admin-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build:
+      context: ./admin-system
+      dockerfile: Dockerfile
+    container_name: admin-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: "123456"
+      REDIS_HOST: redis
+      TZ: Asia/Shanghai
+    volumes:
+      - app_uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  app_uploads:

@@ -1,6 +1,8 @@
 -- 商品分类表（在 rbac.sql 已执行后运行）
 USE admin_system;
 
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS category (
     id          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键',
     name        VARCHAR(50)  NOT NULL COMMENT '分类名称',
