@@ -8,6 +8,7 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [admin-web/](admin-web/) | 管理端前端（Vue3 + Vite + Element Plus） |
 | [docs/phase-b-demo.md](docs/phase-b-demo.md) | Day31 联调演示脚本 + 录屏提纲 + 简历描述 |
 | [docs/docker.md](docs/docker.md) | Day32 Docker Compose 部署指南 |
+| [docs/prod.md](docs/prod.md) | **Day33 生产环境配置与 jar 启动** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
@@ -61,7 +62,7 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 ### 阶段 B3 部署（进行中）
 
 - [x] Day32：Docker Compose（MySQL + Redis + 应用，见 docs/docker.md）
-- [ ] Day33：`application-prod.yml` + 启动文档
+- [x] Day33：`application-prod.yml` + 启动文档（见 docs/prod.md）
 - [ ] Day34：jar 打包 + Docker 一键启动验证
 
 ### 阶段 B3+（未开始）
