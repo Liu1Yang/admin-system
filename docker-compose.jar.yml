@@ -1,0 +1,7 @@
+# 使用本地已打包 jar 构建 app 镜像（需先 mvn package）
+# 用法：docker compose -f docker-compose.yml -f docker-compose.jar.yml up -d --build
+services:
+  app:
+    build:
+      context: ./admin-system
+      dockerfile: Dockerfile.jar

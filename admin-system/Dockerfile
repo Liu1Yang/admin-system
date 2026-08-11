@@ -15,4 +15,5 @@ COPY --from=build /build/target/admin-system-1.0.0.jar /app/app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar", "--spring.profiles.active=docker"]
+# Profile via SPRING_PROFILES_ACTIVE env (docker-compose sets it)
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

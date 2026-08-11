@@ -110,9 +110,7 @@ curl http://localhost:8080/api/health
 | Docker Compose | `docker compose up -d` | `docker`（Dockerfile 内写死） |
 | 服务器直跑 jar | `java -jar ... --spring.profiles.active=prod` | `prod` |
 
-Day34 会把 **jar + Docker** 再整合成「构建一次、到处运行」的完整流程。
-
----
+Day34 会把 **jar + Docker** 再整合成「构建一次、到处运行」的完整流程 → 见 [deploy.md](./deploy.md)。
 
 ## 生产安全 Checklist
 

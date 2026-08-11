@@ -43,7 +43,7 @@ knife4j:
     language: zh_cn
 
 jwt:
-  secret: liuyang-admin-system-jwt-secret-key-2024-study-demo
+  secret: ${JWT_SECRET:liuyang-admin-system-jwt-secret-key-2024-study-demo}
   expiration: 86400000
 
 file:

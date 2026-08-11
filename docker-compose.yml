@@ -48,11 +48,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       MYSQL_HOST: mysql
       MYSQL_USER: root
-      MYSQL_PASSWORD: "123456"
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
       REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:-liuyang-admin-system-jwt-secret-key-2024-study-demo}
       TZ: Asia/Shanghai
     volumes:
       - app_uploads:/app/uploads

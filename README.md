@@ -8,19 +8,23 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [admin-web/](admin-web/) | 管理端前端（Vue3 + Vite + Element Plus） |
 | [docs/phase-b-demo.md](docs/phase-b-demo.md) | Day31 联调演示脚本 + 录屏提纲 + 简历描述 |
 | [docs/docker.md](docs/docker.md) | Day32 Docker Compose 部署指南 |
-| [docs/prod.md](docs/prod.md) | **Day33 生产环境配置与 jar 启动** |
+| [docs/prod.md](docs/prod.md) | Day33 生产环境配置与 jar 启动 |
+| [docs/deploy.md](docs/deploy.md) | **Day34 打包与一键部署** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
 
-### 方式一：Docker（Day32，推荐演示/部署）
+### 方式一：Docker 一键启动（Day32 / Day34）
 
-```bash
-# 在 study 根目录
+```powershell
+# 在 study 根目录 — 全量构建（镜像内 Maven）
 docker compose up -d --build
+
+# 或：本地先打 jar，再构建镜像（更快，Day34）
+.\scripts\up.ps1 -UseLocalJar
 ```
 
-详见 [docs/docker.md](docs/docker.md)。后端：http://localhost:8080
+详见 [docs/docker.md](docs/docker.md)、[docs/deploy.md](docs/deploy.md)。后端：http://localhost:8080
 
 ### 方式二：本地开发
 
@@ -63,7 +67,7 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 
 - [x] Day32：Docker Compose（MySQL + Redis + 应用，见 docs/docker.md）
 - [x] Day33：`application-prod.yml` + 启动文档（见 docs/prod.md）
-- [ ] Day34：jar 打包 + Docker 一键启动验证
+- [x] Day34：jar 打包 + Docker 一键启动（见 docs/deploy.md）
 
 ### 阶段 B3+（未开始）
 - [ ] Day35–38：单元测试、双 Token、限流等

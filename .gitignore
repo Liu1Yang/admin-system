@@ -3,6 +3,7 @@
 target/
 uploads/
 *.iml
+.env
 
 # 后端
 admin-system/target/
