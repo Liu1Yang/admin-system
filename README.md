@@ -9,7 +9,8 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [docs/phase-b-demo.md](docs/phase-b-demo.md) | Day31 联调演示脚本 + 录屏提纲 + 简历描述 |
 | [docs/docker.md](docs/docker.md) | Day32 Docker Compose 部署指南 |
 | [docs/prod.md](docs/prod.md) | Day33 生产环境配置与 jar 启动 |
-| [docs/deploy.md](docs/deploy.md) | **Day34 打包与一键部署** |
+| [docs/deploy.md](docs/deploy.md) | Day34 打包与一键部署 |
+| [docs/testing.md](docs/testing.md) | **Day35 单元测试** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
@@ -69,8 +70,12 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 - [x] Day33：`application-prod.yml` + 启动文档（见 docs/prod.md）
 - [x] Day34：jar 打包 + Docker 一键启动（见 docs/deploy.md）
 
-### 阶段 B3+（未开始）
-- [ ] Day35–38：单元测试、双 Token、限流等
+### 阶段 B3+（进行中）
+
+- [x] Day35：单元测试（JWT / Auth / 黑名单 / Health，见 docs/testing.md）
+- [ ] Day36：双 Token（Access + Refresh）
+- [ ] Day37：接口限流
+- [ ] Day38：收尾与复习
 
 ## IDEA 打开方式
 
