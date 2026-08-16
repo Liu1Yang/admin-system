@@ -21,7 +21,7 @@ async function handleLogin() {
   loading.value = true
   try {
     const res = await login(form)
-    setAuth(res.data.token, res.data.user)
+    setAuth(res.data.accessToken, res.data.refreshToken, res.data.user)
     ElMessage.success('登录成功')
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
     router.push(redirect)

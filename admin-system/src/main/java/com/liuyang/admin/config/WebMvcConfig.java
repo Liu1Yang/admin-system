@@ -26,6 +26,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private static final String[] API_AUTH_EXCLUDES = {
             "/api/auth/login",
             "/api/auth/register",
+            "/api/auth/refresh",
             "/api/health",
             "/doc.html",
             "/webjars/**",

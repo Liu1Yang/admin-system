@@ -43,7 +43,8 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         try {
-            Long userId = jwtUtil.getUserId(token);   // ③ 解析 Token 拿 userId
+            jwtUtil.validateTokenType(token, JwtUtil.TYPE_ACCESS);
+            Long userId = jwtUtil.getUserId(token);
             UserContext.setUserId(userId);    // ④ 存到当前线程
             return true;                          // ⑤ 放行，继续进 Controller
         } catch (JwtException | IllegalArgumentException e) {

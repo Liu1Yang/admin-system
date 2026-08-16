@@ -57,7 +57,8 @@ knife4j:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:86400000}
+  expiration: ${JWT_ACCESS_EXPIRATION:7200000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
 file:
   upload-dir: ${FILE_UPLOAD_DIR:/data/admin-system/uploads}

@@ -82,6 +82,6 @@ mockMvc.perform(get("/api/health")).andExpect(status().isOk());
 
 ## 下一步
 
-- **Day36**：双 Token（Access + Refresh）
+- **Day36**：双 Token（Access + Refresh）→ [dual-token.md](./dual-token.md)
 - **Day37**：接口限流
 - **Day38**：收尾与复习

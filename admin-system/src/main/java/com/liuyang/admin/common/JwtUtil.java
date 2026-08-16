@@ -2,6 +2,7 @@ package com.liuyang.admin.common;
 
 import com.liuyang.admin.config.JwtProperties;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -12,45 +13,71 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JwtUtil {   // JWT 工具类：专门负责 生成 Token 和 解析/校验 Token。
+public class JwtUtil {
+
+    public static final String CLAIM_TYPE = "type";
+    public static final String TYPE_ACCESS = "access";
+    public static final String TYPE_REFRESH = "refresh";
 
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
 
-    public JwtUtil(JwtProperties jwtProperties) {  // 注入 JwtProperties
+    public JwtUtil(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
+    public String generateAccessToken(Long userId, String username) {
+        return buildToken(userId, username, jwtProperties.getExpiration(), TYPE_ACCESS);
+    }
+
+    public String generateRefreshToken(Long userId, String username) {
+        return buildToken(userId, username, jwtProperties.getRefreshExpiration(), TYPE_REFRESH);
+    }
+
+    /** 兼容旧调用 */
     public String generateToken(Long userId, String username) {
+        return generateAccessToken(userId, username);
+    }
+
+    private String buildToken(Long userId, String username, long expireMs, String type) {
         Date now = new Date();
-        Date expireTime = new Date(now.getTime() + jwtProperties.getExpiration());
+        Date expireTime = new Date(now.getTime() + expireMs);
 
         return Jwts.builder()
-                .setSubject(String.valueOf(userId)) // Payload 里存用户 ID（sub 字段）
-                .claim("username", username)   // 额外存用户名
-                .setIssuedAt(now)                  // 签发时间
-                .setExpiration(expireTime)          // 过期时间（现在 + 86400000 毫秒 = 24 小时）
-                .signWith(secretKey, SignatureAlgorithm.HS256) // 用密钥签名，防篡改
-                .compact();                         // 拼成最终字符串 eyJhbGci...
+                .setSubject(String.valueOf(userId))
+                .claim("username", username)
+                .claim(CLAIM_TYPE, type)
+                .setIssuedAt(now)
+                .setExpiration(expireTime)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
-    public Claims parseToken(String token) {  // 解析并校验 Token
+    public Claims parseToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)   // 用同一个 secret 验签
+                .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(token)// 验签名 + 检查是否过期
-                .getBody();          // 取出 Payload（Claims 对象）
-        //  失败会抛异常： 伪造、改过、过期 → JwtException。
+                .parseClaimsJws(token)
+                .getBody();
     }
 
-    public Long getUserId(String token) {  //  从 Token 取用户 ID
+    public Long getUserId(String token) {
         return Long.valueOf(parseToken(token).getSubject());
     }
 
-    /**
-     * Token 剩余有效秒数（用于黑名单 TTL）
-     */
+    public String getTokenType(String token) {
+        Object type = parseToken(token).get(CLAIM_TYPE);
+        return type == null ? null : type.toString();
+    }
+
+    public void validateTokenType(String token, String expectedType) {
+        String type = getTokenType(token);
+        if (!expectedType.equals(type)) {
+            throw new JwtException("Token 类型无效");
+        }
+    }
+
     public long getRemainingSeconds(String token) {
         Date expiration = parseToken(token).getExpiration();
         long seconds = (expiration.getTime() - System.currentTimeMillis()) / 1000;

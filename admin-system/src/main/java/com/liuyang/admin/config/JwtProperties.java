@@ -7,9 +7,13 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "jwt")
-public class JwtProperties {  // 作用：把 yml 里的配置「映射」成 Java 对象
+public class JwtProperties {
 
     private String secret;
 
-    private Long expiration;
+    /** Access Token 有效期（毫秒），默认 2 小时 */
+    private Long expiration = 7200000L;
+
+    /** Refresh Token 有效期（毫秒），默认 7 天 */
+    private Long refreshExpiration = 604800000L;
 }

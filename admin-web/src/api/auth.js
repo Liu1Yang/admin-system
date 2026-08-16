@@ -1,7 +1,12 @@
 import request from './request'
+import { getRefreshToken } from '../utils/auth'
 
 export function login(data) {
   return request.post('/api/auth/login', data)
+}
+
+export function refreshToken(refreshTokenValue) {
+  return request.post('/api/auth/refresh', { refreshToken: refreshTokenValue })
 }
 
 export function getCurrentUser() {
@@ -9,5 +14,6 @@ export function getCurrentUser() {
 }
 
 export function logout() {
-  return request.post('/api/auth/logout')
+  const refreshTokenValue = getRefreshToken()
+  return request.post('/api/auth/logout', refreshTokenValue ? { refreshToken: refreshTokenValue } : {})
 }

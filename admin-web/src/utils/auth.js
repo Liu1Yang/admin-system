@@ -1,8 +1,14 @@
-const TOKEN_KEY = 'token'
+const ACCESS_TOKEN_KEY = 'accessToken'
+const REFRESH_TOKEN_KEY = 'refreshToken'
 const USER_KEY = 'user'
 
+/** Access Token，请求 API 时使用 */
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY)
+  return localStorage.getItem(ACCESS_TOKEN_KEY) || localStorage.getItem('token')
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_KEY)
 }
 
 export function getUser() {
@@ -15,13 +21,24 @@ export function getUser() {
   }
 }
 
-export function setAuth(token, user) {
-  localStorage.setItem(TOKEN_KEY, token)
+export function setAuth(accessToken, refreshToken, user) {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  localStorage.removeItem('token')
   localStorage.setItem(USER_KEY, JSON.stringify(user))
 }
 
+/** 刷新 Token 后只更新令牌，不动用户信息 */
+export function setTokens(accessToken, refreshToken) {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  localStorage.removeItem('token')
+}
+
 export function clearAuth() {
-  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(ACCESS_TOKEN_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_KEY)
+  localStorage.removeItem('token')
   localStorage.removeItem(USER_KEY)
 }
 
@@ -29,7 +46,6 @@ export function isLoggedIn() {
   return !!getToken()
 }
 
-/** 是否拥有某权限编码，供 Day25 菜单/按钮显隐 */
 export function hasPermission(code) {
   const user = getUser()
   if (!user?.permissions?.length) return false
