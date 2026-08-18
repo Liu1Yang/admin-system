@@ -98,5 +98,5 @@ Body（可选）：`{ "refreshToken": "..." }`
 
 ## 下一步
 
-- **Day37**：接口限流
+- **Day37**：接口限流 → [rate-limit.md](./rate-limit.md)
 - **Day38**：收尾复习

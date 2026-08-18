@@ -49,3 +49,10 @@ jwt:
 
 file:
   upload-dir: /app/uploads
+
+rate-limit:
+  enabled: true
+  api-max-requests: 100
+  api-window-seconds: 60
+  login-max-requests: 10
+  login-window-seconds: 60

@@ -62,3 +62,10 @@ jwt:
 
 file:
   upload-dir: ${FILE_UPLOAD_DIR:/data/admin-system/uploads}
+
+rate-limit:
+  enabled: ${RATE_LIMIT_ENABLED:true}
+  api-max-requests: ${RATE_LIMIT_API_MAX:100}
+  api-window-seconds: ${RATE_LIMIT_API_WINDOW:60}
+  login-max-requests: ${RATE_LIMIT_LOGIN_MAX:10}
+  login-window-seconds: ${RATE_LIMIT_LOGIN_WINDOW:60}

@@ -69,6 +69,10 @@ request.interceptors.response.use(
     const originalConfig = response.config
 
     if (result.code !== 401) {
+      if (result.code === 429) {
+        ElMessage.warning(result.message || '请求过于频繁，请稍后再试')
+        return Promise.reject(new Error(result.message || '请求过于频繁'))
+      }
       if (result.code !== 200) {
         ElMessage.error(result.message || '请求失败')
         return Promise.reject(new Error(result.message || '请求失败'))
