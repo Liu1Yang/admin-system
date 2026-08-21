@@ -1,6 +1,7 @@
 # Day37 接口限流
 
-> 基于 **Redis 固定窗口计数**，按 **客户端 IP** 限制请求频率，防止暴力破解与接口滥用。
+> 基于 **Redis ZSET + Lua 滑动窗口**，按 **客户端 IP** 限制请求频率。  
+> Lua 把「删过期记录 → 计数 → 写入」放进一次 `EVAL`，避免并发下计数不准。
 
 ## 限流规则
 
@@ -45,18 +46,26 @@ rate-limit:
 ## 实现结构
 
 ```text
-RateLimitInterceptor (order=0，最先执行)
+RateLimitInterceptor (order=0)
     ↓
 RateLimitService.tryAcquire(scope, max, window)
     ↓
-Redis  key: rate:limit:{scope}
-       INCR + EXPIRE（固定窗口）
+EVAL lua/sliding_window_rate_limit.lua
+    Redis ZSET  key: rate:limit:{scope}
+    score = 请求时间戳(ms)
+    member = 时间戳-UUID
 ```
+
+Lua 步骤：
+
+1. `ZREMRANGEBYSCORE` 删掉窗口外的记录  
+2. `ZCARD` 统计窗口内次数  
+3. 未超限则 `ZADD` 本次请求，并 `PEXPIRE` 窗口时长  
 
 | 类 | 作用 |
 |----|------|
 | `RateLimitProperties` | 读取 yml 配置 |
-| `RateLimitService` | Redis 计数 |
+| `RateLimitService` | 执行 Lua 脚本 |
 | `RateLimitInterceptor` | 按 IP + 路径判断，抛 429 |
 
 拦截器顺序：
@@ -64,6 +73,18 @@ Redis  key: rate:limit:{scope}
 ```
 0 RateLimit  →  1 JWT  →  2 Permission
 ```
+
+Redis 异常时 **降级放行**（宁可放过，也不把业务打挂）。
+
+## 三种算法对比（面试）
+
+| 算法 | 原理 | 优点 | 缺点 |
+|------|------|------|------|
+| 固定窗口 INCR+EXPIRE | 每个整点窗口计数 | 简单、省内存 | 窗口交界可能突发 2 倍流量 |
+| 滑动窗口 ZSET | 记录每次请求时间，统计最近 N 秒 | 精确、无边界尖峰 | 每次请求存一条，内存随 QPS 涨 |
+| **滑动窗口 Lua+ZSET（当前）** | 同上，但 Lua 保证原子性 | 精确 + 并发安全 | 实现稍复杂 |
+
+固定窗口问题示例：限额 10 次/分钟，59 秒打 10 次、下一分钟 0 秒再打 10 次 → 实际 1 秒内 20 次。滑动窗口按「过去 60 秒」计数，不会出现这种尖峰。
 
 ## 客户端 IP 识别
 
@@ -86,12 +107,13 @@ Redis  key: rate:limit:{scope}
 
 第 11 次应返回 `code: 429`。
 
-## 面试常问
+## 面试怎么说
 
-- **固定窗口 vs 滑动窗口：** 固定窗口实现简单（INCR+EXPIRE）；滑动更平滑但实现复杂  
-- **为什么用 Redis：** 多实例部署时限流计数需共享  
-- **429 vs 403：** 429 表示「太多请求」；403 表示「无权限」  
-- **限流粒度：** 本项目按 IP；生产还可按 userId、接口、租户等  
+- **怎么做限流？** 登录按 IP 10 次/分钟，业务 API 100 次/分钟；用 Redis **滑动窗口（ZSET + Lua）**，避免固定窗口边界突发。
+- **为什么要 Lua？** `ZREMRANGE`、`ZCARD`、`ZADD` 若分多次调用，并发下会超卖；Lua 在 Redis 单线程里一次跑完。
+- **为什么不用固定窗口？** 学习项目早期可以用 INCR；对登录防爆破够用，但对精确 QPS 控制，滑动窗口更稳。
+- **ZSET 内存怎么办？** 窗口结束后 `PEXPIRE` 清 key；高 QPS 可再考虑令牌桶。
+- **429 vs 403：** 429 太多请求；403 无权限。
 
 ## Day37 验收
 
@@ -99,6 +121,7 @@ Redis  key: rate:limit:{scope}
 - [ ] 正常业务请求不受影响
 - [ ] `rate-limit.enabled=false` 可关闭限流
 - [ ] `mvn test` 通过（含 RateLimitServiceTest）
+- [ ] 能讲清固定窗口边界问题，以及 Lua 保证原子性的原因
 
 ## 下一步
 

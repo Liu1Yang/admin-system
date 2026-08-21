@@ -1,45 +1,66 @@
 package com.liuyang.admin.service.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.UUID;
 
 /**
- * 固定窗口计数限流（Redis INCR + EXPIRE）。
+ * 滑动窗口限流：Redis ZSET 记录每次请求时间戳，Lua 脚本保证删旧值 / 计数 / 写入原子执行。
  */
 @Service
 public class RateLimitService {
 
+    private static final Logger log = LoggerFactory.getLogger(RateLimitService.class);
     private static final String KEY_PREFIX = "rate:limit:";
 
-    private final StringRedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate; // Spring 提供的 Redis 操作工具，用来连接 Redis、执行命令。
+    private final DefaultRedisScript<Long> slidingWindowScript; //  Lua 脚本的“容器”，用来加载和存放你的限流脚本。
 
     public RateLimitService(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
+        this.slidingWindowScript = new DefaultRedisScript<>();  // 创建一个空的脚本容器
+        this.slidingWindowScript.setScriptSource(
+                new ResourceScriptSource(new ClassPathResource("lua/sliding_window_rate_limit.lua"))); // 说明lua脚本的地址
+        this.slidingWindowScript.setResultType(Long.class); // 告诉它这个脚本返回的是 Long 类型（1L 或 0L）
     }
 
     /**
      * @return true 允许通过；false 超过限额
      */
     public boolean tryAcquire(String scope, int maxRequests, int windowSeconds) {
-        // ① 如果配置不合理（最大请求数 <=0 或窗口时间 <=0），直接放行
         if (maxRequests <= 0 || windowSeconds <= 0) {
             return true;
         }
-        // ② 组装 Redis Key，如 "rate_limit:login:192.168.1.1"
+
         String key = KEY_PREFIX + scope;
-        // ③ Redis 原子自增 +1，返回自增后的值
-        Long count = redisTemplate.opsForValue().increment(key);
-        // ④ 极端情况：Redis 挂了，降级放行（保证服务可用性）
-        if (count == null) {
+        long windowMs = windowSeconds * 1000L;
+        long now = System.currentTimeMillis();
+        String member = now + "-" + UUID.randomUUID();
+
+        try {
+            Long allowed = redisTemplate.execute(
+                    slidingWindowScript,
+                    Collections.singletonList(key),
+                    String.valueOf(windowMs),
+                    String.valueOf(maxRequests),
+                    String.valueOf(now),
+                    member
+            );
+            if (allowed == null) {
+                log.warn("限流脚本返回空，降级放行: {}", key);
+                return true;
+            }
+            return allowed == 1L;
+        } catch (Exception e) {
+            log.warn("限流 Redis 异常，降级放行: {}", e.getMessage());
             return true;
         }
-        // ⑤ 如果是第一次请求（自增后为 1），设置过期时间 = 窗口期
-        if (count == 1L) {
-            redisTemplate.expire(key, windowSeconds, TimeUnit.SECONDS);
-        }
-        // ⑥ 判断是否超限
-        return count <= maxRequests;
     }
 }
