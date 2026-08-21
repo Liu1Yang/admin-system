@@ -134,17 +134,21 @@ npm run dev
 
 **项目名称：** 企业级后台管理系统（前后端分离）
 
-**技术栈：** Spring Boot 2.7、MyBatis-Plus、MySQL、Redis、JWT、Vue3、Element Plus、Vite
+**技术栈：** Spring Boot 2.7、MyBatis-Plus、MySQL、Redis、JWT、Vue3、Element Plus、Vite、Docker
 
 **项目描述：**
 
-- 后端 RESTful API：RBAC 权限、商品分类树、商品 CRUD、Redis 缓存与 Token 黑名单登出
-- 前端 Vue3 管理端：Layout、路由守卫、按 permissions 显隐菜单
-- 完成用户/角色/分类/商品全链路页面，对接分页、搜索、表单、文件上传
-- 使用 Postman + 浏览器完成阶段 A/B 联调
+- 后端 RESTful API：RBAC 权限、商品分类树、商品 CRUD、Redis 缓存与 Token 黑名单
+- 认证：Access/Refresh 双 Token、Refresh 轮换；登出 Access 黑名单 + Refresh 吊销
+- 安全：Redis ZSET + Lua 滑动窗口限流，登录防暴力破解
+- 前端 Vue3 管理端：Layout、路由守卫、按 permissions 显隐菜单、401 自动刷新 Token
+- 部署：Docker Compose 一键启动；Maven 多 Profile（dev/docker/prod）
+- 测试：JUnit5 + Mockito 覆盖 JWT、Auth、限流
 
 **个人职责：**
 
 - 独立完成前后端核心模块开发与联调
-- 设计数据库表与 RBAC 模型，实现接口级鉴权
+- 设计数据库表与 RBAC 模型，实现拦截器链（限流 → JWT → 权限）
 - 封装 Axios 统一请求、401 拦截、权限工具函数
+
+> 完整版见 [review.md](./review.md) 第七节。
