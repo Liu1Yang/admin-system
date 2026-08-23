@@ -39,6 +39,23 @@ services:
       timeout: 3s
       retries: 10
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: admin-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: "123456"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
   app:
     build:
       context: ./admin-system
@@ -53,6 +70,7 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456}
       REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
       JWT_SECRET: ${JWT_SECRET:-liuyang-admin-system-jwt-secret-key-2024-study-demo}
       TZ: Asia/Shanghai
     volumes:
@@ -61,6 +79,8 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
 volumes:
