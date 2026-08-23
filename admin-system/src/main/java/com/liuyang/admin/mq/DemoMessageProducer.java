@@ -22,9 +22,22 @@ public class DemoMessageProducer {
         message.setSentAt(LocalDateTime.now());
 
         rabbitTemplate.convertAndSend(
-                RabbitMqConfig.DEMO_EXCHANGE,    // 交换机名
-                RabbitMqConfig.DEMO_ROUTING_KEY, // 路由键
-                message                          // 消息体
+                RabbitMqConfig.DEMO_EXCHANGE,
+                RabbitMqConfig.DEMO_ROUTING_KEY,
+                message
+        );
+    }
+
+    public void sendRetry(String content, String sender) {
+        DemoMessage message = new DemoMessage();
+        message.setContent(content);
+        message.setSender(sender);
+        message.setSentAt(LocalDateTime.now());
+
+        rabbitTemplate.convertAndSend(
+                RabbitMqConfig.RETRY_EXCHANGE,
+                RabbitMqConfig.RETRY_ROUTING_KEY,
+                message
         );
     }
 }

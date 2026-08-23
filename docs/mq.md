@@ -7,8 +7,8 @@
 | Day | 主题 | 文档 | 状态 |
 |-----|------|------|------|
 | **Day39** | 概念 + Docker + 生产者/消费者 Hello | [mq-day39.md](./mq-day39.md) | ✅ |
-| Day40 | ACK、重试、死信队列 | mq-day40.md（待写） | ⏳ |
-| Day41 | 接入业务：异步操作日志 / 缓存刷新 | mq-day41.md（待写） | ⏳ |
+| **Day40** | ACK、重试、死信队列 | [mq-day40.md](./mq-day40.md) | ✅ |
+| Day41 | 接入业务：异步操作日志 | mq-day41.md（待写） | ⏳ |
 
 ## 和 Redis 的分工
 
@@ -49,13 +49,15 @@ Producer  →  Exchange  →  (routing key)  →  Queue  →  Consumer
 
 ```text
 admin-system/
-├── config/RabbitMqConfig.java    # 队列、交换机、绑定
-├── mq/DemoMessage.java           # 消息体
-├── mq/DemoMessageProducer.java   # 生产者
-├── mq/DemoMessageConsumer.java   # 消费者
-└── controller/MqDemoController.java  # 测试接口
+├── config/RabbitMqConfig.java    # 队列、交换机、DLQ、retryContainerFactory
+├── mq/DemoMessage.java
+├── mq/DemoMessageProducer.java
+├── mq/DemoMessageConsumer.java   # Day39 自动 ACK
+├── mq/RetryMessageConsumer.java  # Day40 手动 ACK + 重试 + basicNack
+├── mq/DlqMessageConsumer.java    # Day40 死信消费
+└── controller/MqDemoController.java
 ```
 
 ## 下一步
 
-完成 [Day39 验收](./mq-day39.md) 后，说「继续 Day40」学习 ACK 与死信队列。
+完成 [Day40 验收](./mq-day40.md) 后，说「继续 Day41」接入业务。
