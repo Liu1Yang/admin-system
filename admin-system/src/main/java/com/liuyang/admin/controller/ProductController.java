@@ -1,6 +1,7 @@
 package com.liuyang.admin.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.liuyang.admin.annotation.OperationLog;
 import com.liuyang.admin.annotation.RequirePermission;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.common.UserContext;
@@ -91,6 +92,7 @@ public class ProductController {
     }
 
     @Operation(summary = "新增商品", description = "新建商品默认下架（status=0）")
+    @OperationLog(module = "商品", action = "新增")
     @RequirePermission("product:write")
     @PostMapping
     public Result<ProductVO> create(@Valid @RequestBody ProductCreateDTO dto) {
@@ -99,6 +101,7 @@ public class ProductController {
     }
 
     @Operation(summary = "修改商品")
+    @OperationLog(module = "商品", action = "修改")
     @RequirePermission("product:write")
     @PutMapping("/{id}")
     public Result<ProductVO> update(
@@ -109,6 +112,7 @@ public class ProductController {
     }
 
     @Operation(summary = "商品上下架", description = "上架时库存必须大于 0")
+    @OperationLog(module = "商品", action = "上下架")
     @RequirePermission("product:write")
     @PutMapping("/{id}/status")
     public Result<ProductVO> updateStatus(
@@ -130,6 +134,7 @@ public class ProductController {
     }
 
     @Operation(summary = "删除商品")
+    @OperationLog(module = "商品", action = "删除")
     @RequirePermission("product:delete")
     @DeleteMapping("/{id}")
     public Result<Void> delete(

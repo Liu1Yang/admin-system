@@ -1,5 +1,6 @@
 package com.liuyang.admin.controller;
 
+import com.liuyang.admin.annotation.OperationLog;
 import com.liuyang.admin.annotation.RequirePermission;
 import com.liuyang.admin.common.Result;
 import com.liuyang.admin.dto.CategoryCreateDTO;
@@ -51,6 +52,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "新增分类")
+    @OperationLog(module = "分类", action = "新增")
     @RequirePermission("product:write")
     @PostMapping
     public Result<CategoryVO> create(@Valid @RequestBody CategoryCreateDTO dto) {
@@ -58,6 +60,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "修改分类")
+    @OperationLog(module = "分类", action = "修改")
     @RequirePermission("product:write")
     @PutMapping("/{id}")
     public Result<CategoryVO> update(
@@ -67,6 +70,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "删除分类", description = "存在子分类时拒绝删除")
+    @OperationLog(module = "分类", action = "删除")
     @RequirePermission("product:write")
     @DeleteMapping("/{id}")
     public Result<Void> delete(

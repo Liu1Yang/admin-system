@@ -1,6 +1,7 @@
 package com.liuyang.admin.config;
 
 import com.liuyang.admin.interceptor.JwtInterceptor;
+import com.liuyang.admin.interceptor.OperationLogInterceptor;
 import com.liuyang.admin.interceptor.PermissionInterceptor;
 import com.liuyang.admin.interceptor.RateLimitInterceptor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,16 +16,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtInterceptor jwtInterceptor;
     private final PermissionInterceptor permissionInterceptor;
     private final RateLimitInterceptor rateLimitInterceptor;
+    private final OperationLogInterceptor operationLogInterceptor;
 
     @Value("${file.upload-dir:uploads}") // 将外部的值注入到Bean中
     private String uploadDir;
 
     public WebMvcConfig(JwtInterceptor jwtInterceptor,
                         PermissionInterceptor permissionInterceptor,
-                        RateLimitInterceptor rateLimitInterceptor) {
+                        RateLimitInterceptor rateLimitInterceptor,
+                        OperationLogInterceptor operationLogInterceptor) {
         this.jwtInterceptor = jwtInterceptor;
         this.permissionInterceptor = permissionInterceptor;
         this.rateLimitInterceptor = rateLimitInterceptor;
+        this.operationLogInterceptor = operationLogInterceptor;
     }
 
     private static final String[] API_AUTH_EXCLUDES = {
@@ -59,6 +63,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 权限拦截器 → 第三个执行
         registry.addInterceptor(permissionInterceptor)
                 .order(2)
+                .addPathPatterns("/api/**")
+                .excludePathPatterns(API_AUTH_EXCLUDES);
+
+        // 操作日志 → 第四个；afterCompletion 逆序执行，先于 JwtInterceptor 清 UserContext
+        registry.addInterceptor(operationLogInterceptor)
+                .order(3)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(API_AUTH_EXCLUDES);
     }

@@ -37,6 +37,11 @@ public class RabbitMqConfig {
 
     public static final int RETRY_MAX_ATTEMPTS = 3;
 
+    // Day41 操作日志（业务队列，自动 ACK）
+    public static final String OPER_LOG_QUEUE = "admin.operlog.queue";
+    public static final String OPER_LOG_EXCHANGE = "admin.operlog.exchange";
+    public static final String OPER_LOG_ROUTING_KEY = "admin.operlog";
+
     @Bean
     public Queue demoQueue() {
         return QueueBuilder.durable(DEMO_QUEUE).build();
@@ -84,6 +89,21 @@ public class RabbitMqConfig {
     @Bean
     public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
         return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(DLQ_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue operLogQueue() {
+        return QueueBuilder.durable(OPER_LOG_QUEUE).build();
+    }
+
+    @Bean
+    public DirectExchange operLogExchange() {
+        return new DirectExchange(OPER_LOG_EXCHANGE);
+    }
+
+    @Bean
+    public Binding operLogBinding(Queue operLogQueue, DirectExchange operLogExchange) {
+        return BindingBuilder.bind(operLogQueue).to(operLogExchange).with(OPER_LOG_ROUTING_KEY);
     }
 
     @Bean

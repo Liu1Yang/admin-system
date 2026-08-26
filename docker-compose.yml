@@ -20,6 +20,7 @@ services:
       - ./admin-system/sql/rbac.sql:/docker-entrypoint-initdb.d/03-rbac.sql:ro
       - ./admin-system/sql/category.sql:/docker-entrypoint-initdb.d/04-category.sql:ro
       - ./admin-system/sql/product.sql:/docker-entrypoint-initdb.d/05-product.sql:ro
+      - ./admin-system/sql/operation-log.sql:/docker-entrypoint-initdb.d/06-operation-log.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p123456"]
       interval: 5s

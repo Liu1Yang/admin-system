@@ -17,6 +17,7 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [docs/mq.md](docs/mq.md) | **阶段 C MQ 学习路线** |
 | [docs/mq-day39.md](docs/mq-day39.md) | Day39 RabbitMQ Hello |
 | [docs/mq-day40.md](docs/mq-day40.md) | **Day40 ACK / 重试 / 死信** |
+| [docs/mq-day41.md](docs/mq-day41.md) | **Day41 异步操作日志** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
@@ -83,11 +84,11 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 - [x] Day37：接口限流 Lua+ZSET（见 docs/rate-limit.md）
 - [x] Day38：收尾与复习（见 [docs/review.md](docs/review.md)）
 
-### 阶段 C MQ（进行中）
+### 阶段 C MQ ✅
 
 - [x] Day39：RabbitMQ 概念 + Docker + 生产者/消费者（见 [docs/mq-day39.md](docs/mq-day39.md)）
 - [x] Day40：ACK、重试、死信队列（见 [docs/mq-day40.md](docs/mq-day40.md)）
-- [ ] Day41：接入业务（异步操作日志）
+- [x] Day41：接入业务 — 异步操作日志（见 [docs/mq-day41.md](docs/mq-day41.md)）
 
 ## IDEA 打开方式
 
