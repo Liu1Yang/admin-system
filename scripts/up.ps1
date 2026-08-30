@@ -34,4 +34,5 @@ Write-Host "==> status" -ForegroundColor Green
 docker compose ps
 Write-Host ""
 Write-Host "Health: http://localhost:8080/api/health" -ForegroundColor Green
+Write-Host "Web:    http://localhost" -ForegroundColor Green
 Write-Host "Doc:    http://localhost:8080/doc.html" -ForegroundColor Green

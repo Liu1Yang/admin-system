@@ -84,6 +84,17 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  web:
+    build:
+      context: ./admin-web
+      dockerfile: Dockerfile
+    container_name: admin-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+
 volumes:
   mysql_data:
   app_uploads:
