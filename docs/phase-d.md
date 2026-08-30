@@ -8,7 +8,7 @@
 |-----|------|------|------|
 | **Day45** | GitHub Actions CI | [ci-day45.md](./ci-day45.md) | ✅ |
 | **Day46** | 前端 Docker 化（Nginx 托管 dist） | [ci-day46.md](./ci-day46.md) | ✅ |
-| Day47 | Nginx 反向代理（统一入口） | ci-day47.md（待写） | ⏳ |
+| **Day47** | Nginx 反向代理（统一入口） | [ci-day47.md](./ci-day47.md) | ✅ |
 | Day48 | Actuator 健康检查增强 | ci-day48.md（待写） | ⏳ |
 | Day49 | 阶段 D 总复习 + 全链路演示 | ci-day49.md（待写） | ⏳ |
 
@@ -26,11 +26,14 @@
 ```text
 .github/workflows/ci.yml   # Push/PR 自动跑后端测试 + 前端构建
 admin-web/Dockerfile       # Day46 多阶段：Node build + Nginx
-admin-web/nginx.conf       # Day46 SPA + /api 反代
+admin-web/nginx.conf       # Day46 SPA + Day47 统一反代
+docker-compose.prod.yml    # Day47 生产拓扑
+docker-compose.dev-api.yml # Day47 调试暴露 8080
 docs/ci-day45.md
 docs/ci-day46.md
+docs/ci-day47.md
 ```
 
 ## 下一步
 
-完成 [Day46 验收](./ci-day46.md) 后，说「继续 Day47」完善统一部署拓扑。
+完成 [Day47 验收](./ci-day47.md) 后，说「继续 Day48」做 Actuator 健康检查。

@@ -1,0 +1,6 @@
+# Day47 开发调试：额外暴露后端 8080（与 prod 叠加使用）
+# 用法：docker compose -f docker-compose.yml -f docker-compose.dev-api.yml up -d
+services:
+  app:
+    ports:
+      - "8080:8080"

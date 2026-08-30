@@ -63,8 +63,9 @@ services:
       dockerfile: Dockerfile
     container_name: admin-app
     restart: unless-stopped
-    ports:
-      - "8080:8080"
+    # Day47：默认不暴露 8080，统一走 web(Nginx) :80；调试可加 -f docker-compose.dev-api.yml
+    expose:
+      - "8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       MYSQL_HOST: mysql

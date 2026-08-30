@@ -1,0 +1,5 @@
+# Day47 生产拓扑：仅 Nginx :80 对外，后端 app 不映射宿主机 8080
+# 用法：docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  app:
+    ports: !reset []  # 清空之前继承到的端口映射

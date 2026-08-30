@@ -24,6 +24,7 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [docs/phase-d.md](docs/phase-d.md) | **阶段 D 工程化与部署进阶** |
 | [docs/ci-day45.md](docs/ci-day45.md) | **Day45 GitHub Actions CI** |
 | [docs/ci-day46.md](docs/ci-day46.md) | **Day46 前端 Docker + Nginx** |
+| [docs/ci-day47.md](docs/ci-day47.md) | **Day47 Nginx 统一入口** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
@@ -103,7 +104,7 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 
 - [x] Day45：GitHub Actions CI（见 [docs/ci-day45.md](docs/ci-day45.md)）
 - [x] Day46：前端 Docker 化（Nginx，见 [docs/ci-day46.md](docs/ci-day46.md)）
-- [ ] Day47：Nginx 反向代理统一入口
+- [x] Day47：Nginx 统一入口（见 [docs/ci-day47.md](docs/ci-day47.md)）
 - [ ] Day48：Actuator 健康检查增强
 - [ ] Day49：阶段 D 总复习
 
