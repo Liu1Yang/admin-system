@@ -37,10 +37,19 @@ public class RabbitMqConfig {
 
     public static final int RETRY_MAX_ATTEMPTS = 3;
 
-    // Day41 操作日志（业务队列，自动 ACK）
+    // Day41 操作日志
     public static final String OPER_LOG_QUEUE = "admin.operlog.queue";
     public static final String OPER_LOG_EXCHANGE = "admin.operlog.exchange";
     public static final String OPER_LOG_ROUTING_KEY = "admin.operlog";
+
+    // Day43 操作日志专用死信队列（与 Day40 demo DLQ 分离，避免消息体类型冲突）
+    public static final String OPER_LOG_DLQ_QUEUE = "admin.operlog.dlq.queue";
+    public static final String OPER_LOG_DLQ_ROUTING_KEY = "admin.operlog.dlq";
+
+    // Day44 商品缓存异步刷新
+    public static final String PRODUCT_CACHE_QUEUE = "admin.product.cache.queue";
+    public static final String PRODUCT_CACHE_EXCHANGE = "admin.product.cache.exchange";
+    public static final String PRODUCT_CACHE_ROUTING_KEY = "admin.product.cache";
 
     @Bean
     public Queue demoQueue() {
@@ -93,7 +102,10 @@ public class RabbitMqConfig {
 
     @Bean
     public Queue operLogQueue() {
-        return QueueBuilder.durable(OPER_LOG_QUEUE).build();
+        return QueueBuilder.durable(OPER_LOG_QUEUE)
+                .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", OPER_LOG_DLQ_ROUTING_KEY)
+                .build();
     }
 
     @Bean
@@ -104,6 +116,31 @@ public class RabbitMqConfig {
     @Bean
     public Binding operLogBinding(Queue operLogQueue, DirectExchange operLogExchange) {
         return BindingBuilder.bind(operLogQueue).to(operLogExchange).with(OPER_LOG_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue operLogDlqQueue() {
+        return QueueBuilder.durable(OPER_LOG_DLQ_QUEUE).build();
+    }
+
+    @Bean
+    public Binding operLogDlqBinding(Queue operLogDlqQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(operLogDlqQueue).to(deadLetterExchange).with(OPER_LOG_DLQ_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue productCacheQueue() {
+        return QueueBuilder.durable(PRODUCT_CACHE_QUEUE).build();
+    }
+
+    @Bean
+    public DirectExchange productCacheExchange() {
+        return new DirectExchange(PRODUCT_CACHE_EXCHANGE);
+    }
+
+    @Bean
+    public Binding productCacheBinding(Queue productCacheQueue, DirectExchange productCacheExchange) {
+        return BindingBuilder.bind(productCacheQueue).to(productCacheExchange).with(PRODUCT_CACHE_ROUTING_KEY);
     }
 
     @Bean

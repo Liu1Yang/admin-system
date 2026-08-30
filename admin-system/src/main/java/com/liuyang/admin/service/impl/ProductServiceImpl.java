@@ -9,6 +9,7 @@ import com.liuyang.admin.entity.Product;
 import com.liuyang.admin.mapper.ProductMapper;
 import com.liuyang.admin.service.CategoryService;
 import com.liuyang.admin.service.ProductService;
+import com.liuyang.admin.mq.ProductCacheProducer;
 import com.liuyang.admin.service.cache.ProductCacheService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -25,13 +26,16 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final CategoryService categoryService;
     private final ProductCacheService productCacheService;
+    private final ProductCacheProducer productCacheProducer;
 
     public ProductServiceImpl(ProductMapper productMapper,
                               CategoryService categoryService,
-                              ProductCacheService productCacheService) {
+                              ProductCacheService productCacheService,
+                              ProductCacheProducer productCacheProducer) {
         this.productMapper = productMapper;
         this.categoryService = categoryService;
         this.productCacheService = productCacheService;
+        this.productCacheProducer = productCacheProducer;
     }
 
     @Override
@@ -91,9 +95,9 @@ public class ProductServiceImpl implements ProductService {
         product.setCoverUrl(dto.getCoverUrl());
         product.setDescription(dto.getDescription());
         product.setCreatorId(creatorId);
-        productMapper.insert(product);
-        productCacheService.set(product);
-        return product;
+        productMapper.insert(product);   // 动作 A：存 MySQL
+        productCacheProducer.sendRefresh(product.getId()); // 触发动作 B：发 MQ 消息
+        return product;  // 不等 B 完成，直接返回 ✅
     }
 
     @Override
@@ -125,7 +129,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productMapper.updateById(product);
-        productCacheService.delete(id);
+        productCacheProducer.sendRefresh(id);
         return product;
     }
 
@@ -140,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStatus(status);
         productMapper.updateById(product);
-        productCacheService.delete(id);
+        productCacheProducer.sendRefresh(id);
         return product;
     }
 
@@ -150,7 +154,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = getById(id);
         product.setCoverUrl(coverUrl);
         productMapper.updateById(product);
-        productCacheService.delete(id);
+        productCacheProducer.sendRefresh(id);
         return product;
     }
 
@@ -158,7 +162,7 @@ public class ProductServiceImpl implements ProductService {
     public void delete(Long id) {
         getById(id);
         productMapper.deleteById(id);
-        productCacheService.delete(id);
+        productCacheProducer.sendDelete(id);
     }
 
     private void validateCategory(Long categoryId) {

@@ -18,6 +18,9 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [docs/mq-day39.md](docs/mq-day39.md) | Day39 RabbitMQ Hello |
 | [docs/mq-day40.md](docs/mq-day40.md) | **Day40 ACK / 重试 / 死信** |
 | [docs/mq-day41.md](docs/mq-day41.md) | **Day41 异步操作日志** |
+| [docs/mq-day42.md](docs/mq-day42.md) | **Day42 操作日志前端** |
+| [docs/mq-day43.md](docs/mq-day43.md) | **Day43 DLQ + 告警** |
+| [docs/mq-day44.md](docs/mq-day44.md) | **Day44 商品缓存异步刷新** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
@@ -89,6 +92,9 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 - [x] Day39：RabbitMQ 概念 + Docker + 生产者/消费者（见 [docs/mq-day39.md](docs/mq-day39.md)）
 - [x] Day40：ACK、重试、死信队列（见 [docs/mq-day40.md](docs/mq-day40.md)）
 - [x] Day41：接入业务 — 异步操作日志（见 [docs/mq-day41.md](docs/mq-day41.md)）
+- [x] Day42：操作日志前端页面（见 [docs/mq-day42.md](docs/mq-day42.md)）
+- [x] Day43：操作日志 DLQ + 告警（见 [docs/mq-day43.md](docs/mq-day43.md)）
+- [x] Day44：商品变更异步刷新 Redis（见 [docs/mq-day44.md](docs/mq-day44.md)）
 
 ## IDEA 打开方式
 

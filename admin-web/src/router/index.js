@@ -8,6 +8,7 @@ import RoleList from '../views/role/RoleList.vue'
 import CategoryTree from '../views/category/CategoryTree.vue'
 import ProductList from '../views/product/ProductList.vue'
 import ProductForm from '../views/product/ProductForm.vue'
+import OperationLogList from '../views/operationLog/OperationLogList.vue'
 
 const routes = [
   {
@@ -62,6 +63,12 @@ const routes = [
         name: 'ProductEdit',
         component: ProductForm,
         meta: { title: '编辑商品', permission: 'product:write' }
+      },
+      {
+        path: 'operation-logs',
+        name: 'OperationLogs',
+        component: OperationLogList,
+        meta: { title: '操作日志', permission: 'log:read' }
       }
     ]
   }
