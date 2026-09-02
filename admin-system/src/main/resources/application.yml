@@ -5,3 +5,22 @@ spring:
 server:
   servlet:
     context-path: /
+
+# Day48 Actuator：健康检查 + 应用信息
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-components: always
+
+info:
+  app:
+    name: admin-system
+    author: LiuYang
+    description: LiuYang Spring Boot 学习项目

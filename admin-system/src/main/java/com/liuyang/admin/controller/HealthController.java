@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/api")
 public class HealthController {
 
-    @Operation(summary = "健康检查")
+    @Operation(summary = "健康检查", description = "简单存活探测；依赖详情见 GET /actuator/health")
     @GetMapping("/health")
     public Result<Map<String, Object>> health() {
         Map<String, Object> info = new HashMap<>();

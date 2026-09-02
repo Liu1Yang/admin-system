@@ -44,6 +44,7 @@ docker compose ps
 Write-Host ""
 Write-Host "Web:    http://localhost" -ForegroundColor Green
 Write-Host "Health: http://localhost/api/health" -ForegroundColor Green
+Write-Host "Actuator: http://localhost/actuator/health" -ForegroundColor Green
 Write-Host "Doc:    http://localhost/doc.html" -ForegroundColor Green
 if (-not $Prod) {
     Write-Host "Tip:    docker compose -f docker-compose.yml -f docker-compose.dev-api.yml up -d  # 额外暴露 8080 调试" -ForegroundColor Yellow

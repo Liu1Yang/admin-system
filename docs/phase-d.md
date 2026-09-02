@@ -9,7 +9,7 @@
 | **Day45** | GitHub Actions CI | [ci-day45.md](./ci-day45.md) | ✅ |
 | **Day46** | 前端 Docker 化（Nginx 托管 dist） | [ci-day46.md](./ci-day46.md) | ✅ |
 | **Day47** | Nginx 反向代理（统一入口） | [ci-day47.md](./ci-day47.md) | ✅ |
-| Day48 | Actuator 健康检查增强 | ci-day48.md（待写） | ⏳ |
+| **Day48** | Actuator 健康检查增强 | [ci-day48.md](./ci-day48.md) | ✅ |
 | Day49 | 阶段 D 总复习 + 全链路演示 | ci-day49.md（待写） | ⏳ |
 
 ## 和阶段 B3 部署的关系
@@ -32,8 +32,9 @@ docker-compose.dev-api.yml # Day47 调试暴露 8080
 docs/ci-day45.md
 docs/ci-day46.md
 docs/ci-day47.md
+docs/ci-day48.md
 ```
 
 ## 下一步
 
-完成 [Day47 验收](./ci-day47.md) 后，说「继续 Day48」做 Actuator 健康检查。
+完成 [Day48 验收](./ci-day48.md) 后，说「继续 Day49」做阶段 D 总复习。
