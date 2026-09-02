@@ -26,6 +26,8 @@ Spring Boot + Vue3 前后端分离后台管理系统。
 | [docs/ci-day46.md](docs/ci-day46.md) | **Day46 前端 Docker + Nginx** |
 | [docs/ci-day47.md](docs/ci-day47.md) | **Day47 Nginx 统一入口** |
 | [docs/ci-day48.md](docs/ci-day48.md) | **Day48 Actuator 健康检查** |
+| [docs/ci-day49.md](docs/ci-day49.md) | **Day49 阶段 D 总复习** |
+| [docs/phase-e.md](docs/phase-e.md) | **阶段 E 进阶选修（Day50+）** |
 | [docs/install-wsl.md](docs/install-wsl.md) | **WSL2 安装指南（Docker 前置）** |
 
 ## 快速启动
@@ -101,15 +103,17 @@ RBAC、商品模块、Redis 缓存、Token 黑名单、Postman 联调
 - [x] Day43：操作日志 DLQ + 告警（见 [docs/mq-day43.md](docs/mq-day43.md)）
 - [x] Day44：商品变更异步刷新 Redis（见 [docs/mq-day44.md](docs/mq-day44.md)）
 
-### 阶段 D 工程化（进行中）
+### 阶段 D 工程化 ✅
 
 - [x] Day45：GitHub Actions CI（见 [docs/ci-day45.md](docs/ci-day45.md)）
 - [x] Day46：前端 Docker 化（Nginx，见 [docs/ci-day46.md](docs/ci-day46.md)）
 - [x] Day47：Nginx 统一入口（见 [docs/ci-day47.md](docs/ci-day47.md)）
 - [x] Day48：Actuator 健康检查（见 [docs/ci-day48.md](docs/ci-day48.md)）
-- [ ] Day49：阶段 D 总复习
+- [x] Day49：阶段 D 总复习（见 [docs/ci-day49.md](docs/ci-day49.md)）
 
-详见 [docs/phase-d.md](docs/phase-d.md)。
+### 阶段 E 选修（Day50+）
+
+详见 [docs/phase-e.md](docs/phase-e.md)：Spring Security、集成测试、HTTPS、K8s 等，按需选学。
 
 ## IDEA 打开方式
 

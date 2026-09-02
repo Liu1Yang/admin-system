@@ -10,7 +10,7 @@
 | **Day46** | 前端 Docker 化（Nginx 托管 dist） | [ci-day46.md](./ci-day46.md) | ✅ |
 | **Day47** | Nginx 反向代理（统一入口） | [ci-day47.md](./ci-day47.md) | ✅ |
 | **Day48** | Actuator 健康检查增强 | [ci-day48.md](./ci-day48.md) | ✅ |
-| Day49 | 阶段 D 总复习 + 全链路演示 | ci-day49.md（待写） | ⏳ |
+| Day49 | 阶段 D 总复习 + 全链路演示 | [ci-day49.md](./ci-day49.md) | ✅ |
 
 ## 和阶段 B3 部署的关系
 
@@ -33,8 +33,13 @@ docs/ci-day45.md
 docs/ci-day46.md
 docs/ci-day47.md
 docs/ci-day48.md
+docs/ci-day49.md
 ```
+
+## 阶段 E（选修）
+
+Day1～49 主线完结。进阶方向见 [phase-e.md](./phase-e.md)（Spring Security、Testcontainers、HTTPS、K8s 等）。
 
 ## 下一步
 
-完成 [Day48 验收](./ci-day48.md) 后，说「继续 Day49」做阶段 D 总复习。
+通读 [Day49 总复习](./ci-day49.md)，录制全栈演示；选修阶段 E 时说「继续 Day50」等。
